@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PowerFit Gym - Transforma tu cuerpo, transforma tu vida</title>
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+    <!-- ========== BARRA PROMO ========== -->
+    <div class="promo-bar" id="promoBar">
+        <div class="container promo-content">
+            <span><i class="fa-solid fa-fire"></i> <strong>¡Oferta limitada!</strong> 50% dcto. en tu primer mes con el código <code>POWER50</code> · Termina pronto</span>
+            <button class="promo-close" aria-label="Cerrar" onclick="document.getElementById('promoBar').style.display='none';localStorage.setItem('promo_cerrado','1')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+    </div>
+
+    <!-- ========== NAVBAR ========== -->
+    <header class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="#inicio" class="logo">
+                <i class="fa-solid fa-dumbbell"></i>
+                <span>Power<strong>Fit</strong></span>
+            </a>
+
+            <nav class="nav-links" id="navLinks">
+                <a href="#inicio">Inicio</a>
+                <a href="#planes">Planes</a>
+                <a href="#tienda">Tienda</a>
+                <a href="#entrenadores">Entrenadores</a>
+                <a href="#faq">FAQ</a>
+                <a href="#contacto">Contacto</a>
+                <button class="theme-toggle" title="Cambiar tema" aria-label="Cambiar tema">
+                    <i class="fa-solid fa-sun"></i>
+                </button>
+                <a href="#" class="cart-nav" onclick="abrirCarrito();return false;" aria-label="Carrito">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="cart-badge" id="cartBadge">0</span>
+                </a>
+                <a href="#login" class="btn-nav">Iniciar sesión</a>
+            </nav>
+
+            <button class="menu-toggle" id="menuToggle" aria-label="Menú">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ========== HERO ========== -->
+    <section class="hero" id="inicio">
+        <div class="hero-overlay"></div>
+        <div class="container hero-content">
+            <h4 class="hero-pre">BIENVENIDO A POWERFIT</h4>
+            <h1>Transforma tu cuerpo,<br/><span>transforma tu vida</span></h1>
+            <p>El gimnasio donde tu esfuerzo se convierte en resultados.
+               Equipos de última generación, entrenadores certificados y la
+               mejor comunidad fitness de la ciudad.</p>
+            <div class="hero-cta">
+                <a href="#planes" class="btn btn-primary">Ver planes <i class="fa-solid fa-arrow-right"></i></a>
+                <a href="#contacto" class="btn btn-ghost">Contáctanos</a>
+            </div>
+
+            <div class="hero-stats">
+                <div><h3>+500</h3><span>Miembros activos</span></div>
+                <div><h3>+30</h3><span>Equipos</span></div>
+                <div><h3>+10</h3><span>Entrenadores</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SERVICIOS ========== -->
+    <section class="seccion" id="servicios">
+        <div class="container">
+            <h2 class="seccion-titulo">Nuestros <span>Servicios</span></h2>
+            <p class="seccion-sub">Todo lo que necesitas para alcanzar tu mejor versión</p>
+
+            <div class="grid grid-3">
+                <div class="card servicio">
+                    <i class="fa-solid fa-dumbbell"></i>
+                    <h3>Sala de pesas</h3>
+                    <p>Más de 30 estaciones con máquinas profesionales y peso libre.</p>
+                </div>
+                <div class="card servicio">
+                    <i class="fa-solid fa-person-running"></i>
+                    <h3>Cardio</h3>
+                    <p>Cintas, elípticas y bicicletas de última generación.</p>
+                </div>
+                <div class="card servicio">
+                    <i class="fa-solid fa-people-group"></i>
+                    <h3>Clases grupales</h3>
+                    <p>Spinning, crossfit, zumba, yoga y funcional todos los días.</p>
+                </div>
+                <div class="card servicio">
+                    <i class="fa-solid fa-user-doctor"></i>
+                    <h3>Asesoría nutricional</h3>
+                    <p>Planes alimenticios personalizados según tu objetivo.</p>
+                </div>
+                <div class="card servicio">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                    <h3>Rutinas personalizadas</h3>
+                    <p>Diseñadas por entrenadores certificados para ti.</p>
+                </div>
+                <div class="card servicio">
+                    <i class="fa-solid fa-shower"></i>
+                    <h3>Vestuarios y duchas</h3>
+                    <p>Instalaciones modernas, seguras y siempre limpias.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PLANES ========== -->
+    <section class="seccion oscura" id="planes">
+        <div class="container">
+            <h2 class="seccion-titulo">Planes de <span>Membresía</span></h2>
+            <p class="seccion-sub">Elige el plan que se adapte a tu ritmo</p>
+
+            <div class="grid grid-4" id="contenedorPlanes">
+                <div class="card plan">
+                    <h3>Plan Diario</h3>
+                    <div class="plan-precio">$15.000<span> COP/día</span></div>
+                    <ul>
+                        <li><i class="fa-solid fa-check"></i> Acceso por un día</li>
+                        <li><i class="fa-solid fa-check"></i> Sala de pesas y cardio</li>
+                        <li><i class="fa-solid fa-check"></i> Sin compromiso</li>
+                    </ul>
+                    <a href="#contacto" class="btn btn-primary">Inscribirme</a>
+                </div>
+                <div class="card plan">
+                    <h3>Plan Mensual</h3>
+                    <div class="plan-precio">$80.000<span> COP/mes</span></div>
+                    <ul>
+                        <li><i class="fa-solid fa-check"></i> Acceso ilimitado</li>
+                        <li><i class="fa-solid fa-check"></i> Sala de pesas y cardio</li>
+                        <li><i class="fa-solid fa-check"></i> Clases grupales</li>
+                    </ul>
+                    <a href="#contacto" class="btn btn-primary">Inscribirme</a>
+                </div>
+                <div class="card plan destacado">
+                    <span class="badge">MÁS POPULAR</span>
+                    <h3>Plan Trimestral</h3>
+                    <div class="plan-precio">$210.000<span> COP/3 meses</span></div>
+                    <ul>
+                        <li><i class="fa-solid fa-check"></i> Todo lo del mensual</li>
+                        <li><i class="fa-solid fa-check"></i> Asesoría nutricional</li>
+                        <li><i class="fa-solid fa-check"></i> Rutina personalizada</li>
+                    </ul>
+                    <a href="#contacto" class="btn btn-primary">Inscribirme</a>
+                </div>
+                <div class="card plan">
+                    <h3>Plan Anual</h3>
+                    <div class="plan-precio">$720.000<span> COP/año</span></div>
+                    <ul>
+                        <li><i class="fa-solid fa-check"></i> Todo incluido</li>
+                        <li><i class="fa-solid fa-check"></i> Camiseta PowerFit gratis</li>
+                        <li><i class="fa-solid fa-check"></i> 20% dcto. en suplementos</li>
+                    </ul>
+                    <a href="#contacto" class="btn btn-primary">Inscribirme</a>
+                </div>
+            </div>
+            <p class="planes-nota">*Precios en pesos colombianos (COP). Sin matrícula ni cargos ocultos.</p>
+
+            <!-- Comparador de planes -->
+            <details class="comparador">
+                <summary><i class="fa-solid fa-table"></i> Ver comparador detallado de planes</summary>
+                <div class="tabla-wrap" style="margin-top:1.2rem;background:transparent;padding:0">
+                    <table class="data">
+                        <thead>
+                            <tr>
+                                <th>Beneficio</th>
+                                <th>Diario</th>
+                                <th>Mensual</th>
+                                <th>Trimestral</th>
+                                <th>Anual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Acceso sala de pesas y cardio</td><td><i class="fa-solid fa-check ok"></i></td><td><i class="fa-solid fa-check ok"></i></td><td><i class="fa-solid fa-check ok"></i></td><td><i class="fa-solid fa-check ok"></i></td></tr>
+                            <tr><td>Clases grupales ilimitadas</td><td><i class="fa-solid fa-xmark no"></i></td><td><i class="fa-solid fa-check ok"></i></td><td><i class="fa-solid fa-check ok"></i></td><td><i class="fa-solid fa-check ok"></i></td></tr>
+                            <tr><td>Asesoría nutricional</td><td><i class="fa-solid fa-xmark no"></i></td><td><i class="fa-solid fa-xmark no"></i></td><td><i class="fa-solid fa-check ok"></i></td><td><i class="fa-solid fa-check ok"></i></td></tr>
+                            <tr><td>Rutina personalizada</td><td><i class="fa-solid fa-xmark no"></i></td><td><i class="fa-solid fa-xmark no"></i></td><td><i class="fa-solid fa-check ok"></i></td><td><i class="fa-solid fa-check ok"></i></td></tr>
+                            <tr><td>Camiseta PowerFit gratis</td><td><i class="fa-solid fa-xmark no"></i></td><td><i class="fa-solid fa-xmark no"></i></td><td><i class="fa-solid fa-xmark no"></i></td><td><i class="fa-solid fa-check ok"></i></td></tr>
+                            <tr><td>20% dcto. en suplementos</td><td><i class="fa-solid fa-xmark no"></i></td><td><i class="fa-solid fa-xmark no"></i></td><td><i class="fa-solid fa-xmark no"></i></td><td><i class="fa-solid fa-check ok"></i></td></tr>
+                            <tr><td>Invitado gratis al mes</td><td><i class="fa-solid fa-xmark no"></i></td><td>1</td><td>2</td><td>4</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- ========== TIENDA MINI ========== -->
+    <section class="seccion" id="tienda">
+        <div class="container">
+            <h2 class="seccion-titulo">Nuestra <span>Tienda</span></h2>
+            <p class="seccion-sub">Suplementos, ropa y accesorios al mejor precio</p>
+
+            <div class="grid grid-4" id="productosGrid"></div>
+            <p class="planes-nota" style="margin-top:2rem">
+                <a href="#" class="btn btn-ghost" onclick="abrirCarrito();return false;">
+                    <i class="fa-solid fa-cart-shopping"></i> Ver carrito (<span id="contadorCarrito">0</span>)
+                </a>
+            </p>
+        </div>
+    </section>
+
+    <!-- ========== CALCULADORA DE CALORÍAS ========== -->
+    <section class="seccion oscura" id="calorias">
+        <div class="container">
+            <h2 class="seccion-titulo">Calculadora de <span>Calorías</span></h2>
+            <p class="seccion-sub">Conoce tu gasto calórico diario (TMB + actividad)</p>
+
+            <div class="card imc-card">
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Edad <input type="number" id="calEdad" min="10" max="100" placeholder="28"></label>
+                    <label>Sexo
+                        <select id="calSexo">
+                            <option value="M">Masculino</option>
+                            <option value="F">Femenino</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Peso (kg) <input type="number" id="calPeso" min="20" max="300" step="0.1" placeholder="72"></label>
+                    <label>Altura (cm) <input type="number" id="calAltura" min="100" max="230" placeholder="172"></label>
+                </div>
+                <label>Nivel de actividad
+                    <select id="calActividad">
+                        <option value="1.2">Sedentario (poco o nada de ejercicio)</option>
+                        <option value="1.375">Ligero (1-3 días/semana)</option>
+                        <option value="1.55" selected>Moderado (3-5 días/semana)</option>
+                        <option value="1.725">Activo (6-7 días/semana)</option>
+                        <option value="1.9">Muy activo (atleta)</option>
+                    </select>
+                </label>
+                <button class="btn btn-primary" id="btnCalcularCal">Calcular calorías</button>
+                <div class="imc-resultado" id="calResultado"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== HORARIOS DE CLASES ========== -->
+    <section class="seccion" id="horarios">
+        <div class="container">
+            <h2 class="seccion-titulo">Horario de <span>Clases</span></h2>
+            <p class="seccion-sub">Encuentra tu clase favorita esta semana</p>
+
+            <div class="tabla-wrap">
+                <table class="data horario">
+                    <thead>
+                        <tr>
+                            <th>Hora</th>
+                            <th>Lunes</th>
+                            <th>Martes</th>
+                            <th>Miércoles</th>
+                            <th>Jueves</th>
+                            <th>Viernes</th>
+                            <th>Sábado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>6:00 AM</td><td>Spinning</td><td>Funcional</td><td>Spinning</td><td>Funcional</td><td>Spinning</td><td>Crossfit</td></tr>
+                        <tr><td>9:00 AM</td><td>Yoga</td><td>Pilates</td><td>Yoga</td><td>Pilates</td><td>Yoga</td><td>Zumba</td></tr>
+                        <tr><td>5:00 PM</td><td>Crossfit</td><td>Boxeo</td><td>Crossfit</td><td>Boxeo</td><td>Crossfit</td><td>—</td></tr>
+                        <tr><td>7:00 PM</td><td>Zumba</td><td>HIIT</td><td>Zumba</td><td>HIIT</td><td>Zumba</td><td>—</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== ENTRENADORES ========== -->
+    <section class="seccion oscura" id="entrenadores">
+        <div class="container">
+            <h2 class="seccion-titulo">Nuestros <span>Entrenadores</span></h2>
+            <p class="seccion-sub">Profesionales certificados que te guiarán</p>
+
+            <div class="grid grid-3">
+                <div class="card entrenador">
+                    <div class="entrenador-foto" style="background-image:url('https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=400')"></div>
+                    <h3>Carlos Ramírez</h3>
+                    <p class="entrenador-rol">Powerlifting & Fuerza</p>
+                    <p>10 años de experiencia, especialista en preparación de competencias.</p>
+                </div>
+                <div class="card entrenador">
+                    <div class="entrenador-foto" style="background-image:url('https://images.unsplash.com/photo-1594381898411-846e7d193883?w=400')"></div>
+                    <h3>Daniela Torres</h3>
+                    <p class="entrenador-rol">Funcional & HIIT</p>
+                    <p>Certificada CrossFit L2 y especialista en pérdida de grasa.</p>
+                </div>
+                <div class="card entrenador">
+                    <div class="entrenador-foto" style="background-image:url('https://images.unsplash.com/photo-1583468982228-19f19164aee2?w=400')"></div>
+                    <h3>Andrés Mejía</h3>
+                    <p class="entrenador-rol">Nutrición Deportiva</p>
+                    <p>Nutricionista deportivo, diseña planes alimenticios personalizados.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CALCULADORA IMC ========== -->
+    <section class="seccion" id="imc">
+        <div class="container">
+            <h2 class="seccion-titulo">Calculadora <span>IMC</span></h2>
+            <p class="seccion-sub">Conoce tu índice de masa corporal en segundos</p>
+
+            <div class="card imc-card">
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Peso (kg)
+                        <input type="number" id="imcPeso" min="20" max="300" step="0.1" placeholder="Ej: 72">
+                    </label>
+                    <label>Altura (cm)
+                        <input type="number" id="imcAltura" min="100" max="230" step="1" placeholder="Ej: 172">
+                    </label>
+                </div>
+                <button class="btn btn-primary" id="btnCalcularIMC">Calcular IMC</button>
+                <div class="imc-resultado" id="imcResultado"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== TESTIMONIOS ========== -->
+    <section class="seccion oscura" id="testimonios">
+        <div class="container">
+            <h2 class="seccion-titulo">Lo que dicen nuestros <span>miembros</span></h2>
+            <p class="seccion-sub">Historias reales, resultados reales</p>
+
+            <div class="grid grid-3">
+                <div class="card testimonio">
+                    <div class="estrellas"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    <p>"Bajé 12 kilos en 6 meses con la rutina personalizada. ¡El mejor gimnasio de Bogotá!"</p>
+                    <h4>— Laura Gómez</h4>
+                </div>
+                <div class="card testimonio">
+                    <div class="estrellas"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    <p>"Los entrenadores son increíbles. Subí 8 kg de masa muscular en un año."</p>
+                    <h4>— Daniel Restrepo</h4>
+                </div>
+                <div class="card testimonio">
+                    <div class="estrellas"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    <p>"Las clases de spinning son adictivas. Volví a sentirme con energía a los 45 años."</p>
+                    <h4>— Marcela Ríos</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== GALERÍA ========== -->
+    <section class="seccion" id="galeria">
+        <div class="container">
+            <h2 class="seccion-titulo">Nuestra <span>Galería</span></h2>
+            <p class="seccion-sub">Conoce nuestras instalaciones</p>
+
+            <div class="galeria">
+                <div class="gal-item" style="background-image:url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600')"></div>
+                <div class="gal-item" style="background-image:url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=600')"></div>
+                <div class="gal-item" style="background-image:url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600')"></div>
+                <div class="gal-item" style="background-image:url('https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=600')"></div>
+                <div class="gal-item" style="background-image:url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600')"></div>
+                <div class="gal-item" style="background-image:url('https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=600')"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== LOGIN / CONTACTO ========== -->
+    <section class="seccion oscura" id="login">
+        <div class="container">
+            <h2 class="seccion-titulo">Acceso <span>Administrativo</span></h2>
+            <p class="seccion-sub">Inicia sesión o regístrate para acceder al panel</p>
+
+            <div class="grid grid-2 auth-grid">
+                <form class="card form" id="formLogin" autocomplete="off">
+                    <h3><i class="fa-solid fa-right-to-bracket"></i> Iniciar sesión</h3>
+                    <label>Email
+                        <input type="email" name="email" required placeholder="admin@powerfit.com">
+                    </label>
+                    <label>Contraseña
+                        <input type="password" name="password" required minlength="6" placeholder="••••••••">
+                    </label>
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+                    <small class="msg" id="msgLogin"></small>
+                    <div class="login-demos">
+                        <strong>Cuentas de prueba</strong>
+                        <ul>
+                            <li><i class="fa-solid fa-user-shield"></i> Admin: <code>admin@powerfit.com</code> / <code>admin123</code></li>
+                            <li><i class="fa-solid fa-user-tie"></i> Entrenador: <code>carlos@powerfit.com</code> / <code>entrenador123</code></li>
+                            <li><i class="fa-solid fa-user"></i> Cliente: <code>juan@mail.com</code> / <code>cliente123</code></li>
+                        </ul>
+                    </div>
+                </form>
+
+                <form class="card form" id="formRegistro" autocomplete="off">
+                    <h3><i class="fa-solid fa-user-plus"></i> Registrarse</h3>
+                    <label>Nombre completo
+                        <input type="text" name="nombre" required placeholder="Tu nombre">
+                    </label>
+                    <label>Email
+                        <input type="email" name="email" required placeholder="correo@ejemplo.com">
+                    </label>
+                    <label>Contraseña
+                        <input type="password" name="password" required minlength="6" placeholder="Mínimo 6 caracteres">
+                    </label>
+                    <button type="submit" class="btn btn-primary">Crear cuenta</button>
+                    <small class="msg" id="msgRegistro"></small>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CONTACTO ========== -->
+    <section class="seccion" id="contacto">
+        <div class="container">
+            <h2 class="seccion-titulo">Contáctanos</h2>
+            <p class="seccion-sub">¿Tienes preguntas? Estamos aquí para ayudarte</p>
+
+            <div class="grid grid-2">
+                <div class="card contacto-info">
+                    <p><i class="fa-solid fa-location-dot"></i> Carrera 13 # 85-32, Bogotá - Colombia</p>
+                    <p><i class="fa-solid fa-phone"></i> +57 320 224 7563</p>
+                    <p><i class="fa-brands fa-whatsapp"></i> <a href="https://wa.me/573202247563" target="_blank" rel="noopener">WhatsApp directo</a></p>
+                    <p><i class="fa-solid fa-envelope"></i> info@powerfit.com.co</p>
+                    <p><i class="fa-solid fa-clock"></i> Lun a Sáb 5:00 AM - 11:00 PM</p>
+                    <div class="mapa">
+                        <iframe
+                            src="https://www.google.com/maps?q=Carrera+13+85-32+Bogota&output=embed"
+                            width="100%" height="180" style="border:0;border-radius:10px;margin-top:0.8rem"
+                            loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                            title="Ubicación PowerFit"></iframe>
+                    </div>
+                    <div class="redes">
+                        <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+                <form class="card form" id="formContacto">
+                    <label>Nombre
+                        <input type="text" name="nombre" required>
+                    </label>
+                    <label>Email
+                        <input type="email" name="email" required>
+                    </label>
+                    <label>Mensaje
+                        <textarea name="mensaje" rows="4" required></textarea>
+                    </label>
+                    <button type="submit" class="btn btn-primary">Enviar mensaje</button>
+                    <small class="msg" id="msgContacto"></small>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FAQ ========== -->
+    <section class="seccion oscura" id="faq">
+        <div class="container">
+            <h2 class="seccion-titulo">Preguntas <span>Frecuentes</span></h2>
+            <p class="seccion-sub">Resolvemos tus dudas más comunes</p>
+
+            <div class="faq-list">
+                <details class="faq-item">
+                    <summary>¿Necesito agendar para entrenar?</summary>
+                    <p>No, para sala de pesas y cardio puedes llegar a cualquier hora dentro de nuestro horario. Las clases grupales sí requieren reserva previa para garantizar tu cupo.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>¿Hay matrícula o costos adicionales?</summary>
+                    <p>No. Nuestros precios son finales: solo pagas el plan elegido. Sin cargos ocultos, sin matrícula y sin permanencia mínima.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>¿Qué métodos de pago aceptan?</summary>
+                    <p>Efectivo, tarjeta débito/crédito, Nequi, Daviplata, transferencia bancaria y PSE.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>¿Puedo congelar mi membresía?</summary>
+                    <p>Sí, puedes congelar hasta 15 días en planes trimestrales y hasta 30 días en planes anuales sin costo adicional. Solo avísanos con 48 horas de anticipación.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>¿Cuántas personas pueden usar el plan pareja?</summary>
+                    <p>Dos personas con acceso ilimitado por solo $140.000 COP/mes. Deben estar registradas al momento de la inscripción.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>¿Tienen estacionamiento?</summary>
+                    <p>Sí, contamos con parqueadero gratuito para miembros (sujeto a disponibilidad).</p>
+                </details>
+                <details class="faq-item">
+                    <summary>¿Ofrecen clase de prueba gratis?</summary>
+                    <p>¡Sí! Tu primera visita es completamente gratis. Agenda con nuestro equipo por WhatsApp.</p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NEWSLETTER ========== -->
+    <section class="seccion newsletter-section">
+        <div class="container newsletter-box">
+            <div>
+                <h2><i class="fa-solid fa-envelope-open-text"></i> Únete a nuestra comunidad</h2>
+                <p>Recibe rutinas gratis, consejos de nutrición y ofertas exclusivas directo en tu correo.</p>
+            </div>
+            <form class="newsletter-form" id="formNewsletter">
+                <input type="email" placeholder="tu@correo.com" required>
+                <button class="btn btn-primary">Suscribirme <i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+        </div>
+    </section>
+
+    <!-- ========== MODAL CARRITO ========== -->
+    <div class="modal-bg" id="modalCarrito">
+        <div class="modal">
+            <button class="modal-close" onclick="cerrarModal('modalCarrito')"><i class="fa-solid fa-xmark"></i></button>
+            <h3><i class="fa-solid fa-cart-shopping"></i> Tu carrito</h3>
+            <div id="contenidoCarrito" class="carrito-contenido"></div>
+            <div class="carrito-total">
+                <span>Total:</span>
+                <strong id="totalCarrito">$0</strong>
+            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="finalizarCompra()">
+                <i class="fa-brands fa-whatsapp"></i> Finalizar por WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div>
+                <a href="#inicio" class="logo">
+                    <i class="fa-solid fa-dumbbell"></i>
+                    <span>Power<strong>Fit</strong></span>
+                </a>
+                <p>El mejor gimnasio de la ciudad. Únete a la comunidad fitness #1.</p>
+            </div>
+            <div>
+                <h4>Navegación</h4>
+                <a href="#inicio">Inicio</a>
+                <a href="#servicios">Servicios</a>
+                <a href="#planes">Planes</a>
+                <a href="#contacto">Contacto</a>
+            </div>
+            <div>
+                <h4>Horario</h4>
+                <p>Lun a Vie: 5:00 - 23:00</p>
+                <p>Sábado: 6:00 - 20:00</p>
+                <p>Domingo: 8:00 - 14:00</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 PowerFit Gym - Todos los derechos reservados</p>
+        </div>
+    </footer>
+
+    <!-- ========== BOTÓN FLOTANTE WHATSAPP ========== -->
+    <a class="fab-whatsapp" href="https://wa.me/573202247563" target="_blank" rel="noopener" title="Escríbenos por WhatsApp" aria-label="WhatsApp">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <!-- ========== BOTÓN VOLVER ARRIBA ========== -->
+    <button class="fab-top" id="btnTop" title="Volver arriba" aria-label="Volver arriba">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Calculadora de IMC
+        document.getElementById('btnCalcularIMC')?.addEventListener('click', () => {
+            const peso = parseFloat(document.getElementById('imcPeso').value);
+            const altCm = parseFloat(document.getElementById('imcAltura').value);
+            const out = document.getElementById('imcResultado');
+            if (!peso || !altCm || peso <= 0 || altCm <= 0) {
+                out.innerHTML = '<span class="msg error">Ingresa valores válidos de peso y altura.</span>';
+                return;
+            }
+            const m = altCm / 100;
+            const imc = peso / (m * m);
+            let categoria = '', clase = '';
+            if (imc < 18.5)       { categoria = 'Bajo peso';        clase = 'warning'; }
+            else if (imc < 25)    { categoria = 'Peso normal';      clase = 'ok'; }
+            else if (imc < 30)    { categoria = 'Sobrepeso';        clase = 'warning'; }
+            else                  { categoria = 'Obesidad';         clase = 'error'; }
+            out.innerHTML = `
+                <div class="imc-valor ${clase}">${imc.toFixed(1)}</div>
+                <div class="imc-cat">${categoria}</div>
+                <small>Te recomendamos consultar con nuestro nutricionista para un plan personalizado.</small>
+            `;
+        });
+
+        // Botón volver arriba
+        const btnTop = document.getElementById('btnTop');
+        window.addEventListener('scroll', () => {
+            btnTop.classList.toggle('show', window.scrollY > 600);
+        });
+        btnTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Formulario de contacto - feedback con toast
+        document.getElementById('formContacto')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            toast('¡Gracias! Te responderemos pronto.', 'ok');
+            e.target.reset();
+        });
+
+        // ===== Promo bar (recuerda si fue cerrada) =====
+        if (localStorage.getItem('promo_cerrado') === '1') {
+            const bar = document.getElementById('promoBar');
+            if (bar) bar.style.display = 'none';
+        }
+
+        // ===== TIENDA / CARRITO =====
+        const PRODUCTOS_TIENDA = [
+            { id:1, nombre:'Whey Protein 2lb',  marca:'Optimum',  precio:185000, img:'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400' },
+            { id:2, nombre:'Creatina 300g',     marca:'MuscleTech',precio:95000,  img:'https://images.unsplash.com/photo-1579722821273-0f6c1b5d0c1c?w=400' },
+            { id:3, nombre:'Camiseta PowerFit', marca:'PowerFit', precio:55000,  img:'https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=400' },
+            { id:4, nombre:'Shaker 600ml',      marca:'PowerFit', precio:25000,  img:'img/productos/shaker-600ml.jpg' },
+            { id:5, nombre:'Pre-entreno C4',    marca:'Cellucor', precio:165000, img:'img/productos/pre-entreno-c4.jpg' },
+            { id:6, nombre:'Guantes training',  marca:'Harbinger',precio:75000,  img:'img/productos/guantes-training.jpg' },
+            { id:7, nombre:'Banda elástica',    marca:'Iron Bull',precio:45000,  img:'img/productos/banda-elastica.jpg' },
+            { id:8, nombre:'Bebida hidratante', marca:'Powerade', precio:6500,   img:'img/productos/bebida-hidratante.jpg' }
+        ];
+
+        const CARRITO_KEY = 'powerfit_carrito';
+        const cargarCarrito = () => JSON.parse(localStorage.getItem(CARRITO_KEY) || '[]');
+        const guardarCarrito = (c) => localStorage.setItem(CARRITO_KEY, JSON.stringify(c));
+
+        function renderTienda() {
+            const grid = document.getElementById('productosGrid');
+            grid.innerHTML = PRODUCTOS_TIENDA.map(p => `
+                <div class="card producto">
+                    <div class="prod-img" style="background-image:url('${p.img}')"></div>
+                    <small class="prod-marca">${p.marca}</small>
+                    <h3>${p.nombre}</h3>
+                    <div class="prod-precio">${formatoMoneda(p.precio)}</div>
+                    <button class="btn btn-primary btn-sm" onclick="agregarCarrito(${p.id})">
+                        <i class="fa-solid fa-plus"></i> Agregar
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function actualizarContadorCarrito() {
+            const total = cargarCarrito().reduce((s, i) => s + i.cantidad, 0);
+            document.querySelectorAll('#contadorCarrito, #cartBadge').forEach(el => el.textContent = total);
+        }
+
+        function agregarCarrito(id) {
+            const p = PRODUCTOS_TIENDA.find(x => x.id === id);
+            if (!p) return;
+            const c = cargarCarrito();
+            const item = c.find(x => x.id === id);
+            if (item) item.cantidad++;
+            else c.push({ ...p, cantidad: 1 });
+            guardarCarrito(c);
+            actualizarContadorCarrito();
+            toast(`${p.nombre} añadido al carrito`, 'ok');
+        }
+
+        function cambiarCantidad(id, delta) {
+            const c = cargarCarrito();
+            const item = c.find(x => x.id === id);
+            if (!item) return;
+            item.cantidad += delta;
+            if (item.cantidad <= 0) {
+                guardarCarrito(c.filter(x => x.id !== id));
+            } else {
+                guardarCarrito(c);
+            }
+            renderCarrito();
+            actualizarContadorCarrito();
+        }
+
+        function quitarDelCarrito(id) {
+            guardarCarrito(cargarCarrito().filter(x => x.id !== id));
+            renderCarrito();
+            actualizarContadorCarrito();
+        }
+
+        function renderCarrito() {
+            const cont = document.getElementById('contenidoCarrito');
+            const c = cargarCarrito();
+            if (!c.length) {
+                cont.innerHTML = '<p style="text-align:center;color:var(--text-300);padding:1rem 0">Tu carrito está vacío</p>';
+                document.getElementById('totalCarrito').textContent = formatoMoneda(0);
+                return;
+            }
+            cont.innerHTML = c.map(i => `
+                <div class="carrito-item">
+                    <div class="ci-img" style="background-image:url('${i.img}')"></div>
+                    <div class="ci-info">
+                        <strong>${i.nombre}</strong>
+                        <small>${formatoMoneda(i.precio)} c/u</small>
+                    </div>
+                    <div class="ci-cant">
+                        <button onclick="cambiarCantidad(${i.id}, -1)">−</button>
+                        <span>${i.cantidad}</span>
+                        <button onclick="cambiarCantidad(${i.id}, 1)">+</button>
+                    </div>
+                    <button class="ci-del" onclick="quitarDelCarrito(${i.id})" aria-label="Quitar"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+            const total = c.reduce((s, i) => s + i.precio * i.cantidad, 0);
+            document.getElementById('totalCarrito').textContent = formatoMoneda(total);
+        }
+
+        function abrirCarrito() {
+            renderCarrito();
+            abrirModal('modalCarrito');
+        }
+
+        function finalizarCompra() {
+            const c = cargarCarrito();
+            if (!c.length) return toast('Tu carrito está vacío', 'error');
+            const total = c.reduce((s, i) => s + i.precio * i.cantidad, 0);
+            const lineas = c.map(i => `• ${i.nombre} x${i.cantidad} - ${formatoMoneda(i.precio * i.cantidad)}`).join('\n');
+            const msg = `Hola PowerFit, quiero pedir:\n\n${lineas}\n\nTotal: ${formatoMoneda(total)}`;
+            window.open(`https://wa.me/573202247563?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        renderTienda();
+        actualizarContadorCarrito();
+
+        // ===== CALCULADORA DE CALORÍAS =====
+        document.getElementById('btnCalcularCal')?.addEventListener('click', () => {
+            const edad = parseInt(document.getElementById('calEdad').value);
+            const sexo = document.getElementById('calSexo').value;
+            const peso = parseFloat(document.getElementById('calPeso').value);
+            const alt  = parseFloat(document.getElementById('calAltura').value);
+            const act  = parseFloat(document.getElementById('calActividad').value);
+            const out  = document.getElementById('calResultado');
+
+            if (!edad || !peso || !alt) {
+                out.innerHTML = '<span class="msg error">Completa todos los campos</span>';
+                return;
+            }
+            // Mifflin-St Jeor
+            const tmb = sexo === 'M'
+                ? 10 * peso + 6.25 * alt - 5 * edad + 5
+                : 10 * peso + 6.25 * alt - 5 * edad - 161;
+            const gasto = Math.round(tmb * act);
+
+            out.innerHTML = `
+                <div class="imc-valor ok">${gasto.toLocaleString('es-CO')}</div>
+                <div class="imc-cat">kcal/día para mantener tu peso</div>
+                <div class="cal-objetivos">
+                    <div><strong>${Math.round(gasto - 500).toLocaleString('es-CO')}</strong><small>Perder grasa</small></div>
+                    <div><strong>${gasto.toLocaleString('es-CO')}</strong><small>Mantener</small></div>
+                    <div><strong>${Math.round(gasto + 500).toLocaleString('es-CO')}</strong><small>Ganar músculo</small></div>
+                </div>
+            `;
+        });
+
+        // ===== NEWSLETTER =====
+        document.getElementById('formNewsletter')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            toast('¡Suscripción confirmada! Te enviamos un correo de bienvenida.', 'ok');
+            e.target.reset();
+        });
+
+        // ===== CONTADORES ANIMADOS EN HERO STATS =====
+        const animarContador = (el) => {
+            const texto = el.textContent.trim();
+            const match = texto.match(/(\+?)(\d+)/);
+            if (!match) return;
+            const prefix = match[1];
+            const target = parseInt(match[2]);
+            let actual = 0;
+            const step = Math.max(1, Math.round(target / 40));
+            const iv = setInterval(() => {
+                actual += step;
+                if (actual >= target) { actual = target; clearInterval(iv); }
+                el.textContent = prefix + actual;
+            }, 30);
+        };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(en => {
+                if (en.isIntersecting) {
+                    animarContador(en.target);
+                    observer.unobserve(en.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        document.querySelectorAll('.hero-stats h3').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portal Entrenador - PowerFit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <a href="entrenador.html" class="logo">
+                <i class="fa-solid fa-dumbbell"></i><span>Power<strong>Fit</strong></span>
+            </a>
+            <nav>
+                <a href="entrenador.html" class="activo"><i class="fa-solid fa-gauge"></i> Mi panel</a>
+                <a href="#misClientes"><i class="fa-solid fa-users"></i> Mis clientes</a>
+                <a href="#misRutinas"><i class="fa-solid fa-clipboard-list"></i> Mis rutinas</a>
+                <a href="#" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Panel del Entrenador</h1>
+                <div style="display:flex;gap:0.6rem;align-items:center">
+                    <button class="theme-toggle" title="Cambiar tema"><i class="fa-solid fa-sun"></i></button>
+                    <div class="user-chip">
+                        <i class="fa-solid fa-user-tie"></i>
+                        <span id="userName">Entrenador</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi info"><h4>Mis clientes</h4><div class="valor" id="kpiClientes">0</div></div>
+                <div class="kpi success"><h4>Rutinas activas</h4><div class="valor" id="kpiActivas">0</div></div>
+                <div class="kpi warning"><h4>Total asignaciones</h4><div class="valor" id="kpiTotal">0</div></div>
+            </div>
+
+            <!-- MIS CLIENTES -->
+            <div class="tabla-wrap" id="misClientes" style="margin-bottom:1.5rem">
+                <div class="topbar-sec">
+                    <h2>Mis clientes</h2>
+                    <button class="btn btn-primary" onclick="abrirAsignar()">
+                        <i class="fa-solid fa-plus"></i> Asignar rutina
+                    </button>
+                </div>
+                <table class="data" id="tablaClientes">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Documento</th>
+                            <th>Teléfono</th>
+                            <th>Rutina actual</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- MIS RUTINAS ASIGNADAS -->
+            <div class="tabla-wrap" id="misRutinas">
+                <div class="topbar-sec"><h2>Rutinas que asigné</h2></div>
+                <div class="tabla-tools">
+                    <input type="text" id="buscar" placeholder="Buscar por cliente o rutina...">
+                </div>
+                <table class="data" id="tablaAsig">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Rutina</th>
+                            <th>Inicio</th>
+                            <th>Fin</th>
+                            <th>Estado</th>
+                            <th>Notas</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL Asignar/editar rutina -->
+    <div class="modal-bg" id="modalRut">
+        <div class="modal">
+            <button class="modal-close" onclick="cerrarModal('modalRut')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 id="modalTit">Asignar rutina</h3>
+            <form class="form" id="formRut">
+                <input type="hidden" name="id" />
+                <label>Cliente
+                    <select name="cliente_id" id="selCli" required></select>
+                </label>
+                <label>Rutina
+                    <select name="rutina_id" id="selRut" required></select>
+                </label>
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Fecha inicio <input type="date" name="fecha_inicio" required></label>
+                    <label>Fecha fin <input type="date" name="fecha_fin"></label>
+                </div>
+                <label>Estado
+                    <select name="estado">
+                        <option value="activa">Activa</option>
+                        <option value="pausada">Pausada</option>
+                        <option value="completada">Completada</option>
+                    </select>
+                </label>
+                <label>Notas del entrenador
+                    <textarea name="notas" rows="3" placeholder="Observaciones, ajustes, progresión..."></textarea>
+                </label>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <small class="msg" id="msgRut"></small>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        // Solo entrenadores
+        const USUARIO = requireRol('entrenador');
+        if (!USUARIO) throw new Error('redirect');
+        const ENTRENADOR_ID = Number(USUARIO.id);
+
+        const getClientes = () => JSON.parse(localStorage.getItem('powerfit_clientes') || '[]');
+        const getRutinas  = () => JSON.parse(localStorage.getItem('powerfit_rutinas')  || '[]');
+        const storeAsig   = demoStore('powerfit_rutinas_asig', []);
+
+        const misClientes = () => getClientes().filter(c => Number(c.entrenador_id) === ENTRENADOR_ID);
+        const misAsig     = () => storeAsig.all().filter(a => Number(a.entrenador_id) === ENTRENADOR_ID);
+
+        const nombreCliente = (id) => {
+            const c = getClientes().find(x => Number(x.id_cliente) === Number(id));
+            return c ? `${c.nombre} ${c.apellido}` : 'Cliente #' + id;
+        };
+        const nombreRutina = (id) => {
+            const r = getRutinas().find(x => Number(x.id_rutina) === Number(id));
+            return r ? r.nombre : 'Rutina #' + id;
+        };
+        // Rutina activa más reciente de un cliente (asignada por este entrenador)
+        const rutinaActual = (clienteId) => {
+            const acts = misAsig()
+                .filter(a => Number(a.cliente_id) === Number(clienteId) && a.estado === 'activa')
+                .sort((x, y) => String(y.fecha_inicio).localeCompare(String(x.fecha_inicio)));
+            return acts.length ? nombreRutina(acts[0].rutina_id) : '<span style="color:var(--text-300)">Sin rutina activa</span>';
+        };
+
+        function renderKPIs() {
+            const asig = misAsig();
+            document.getElementById('kpiClientes').textContent = misClientes().length;
+            document.getElementById('kpiActivas').textContent  = asig.filter(a => a.estado === 'activa').length;
+            document.getElementById('kpiTotal').textContent    = asig.length;
+        }
+
+        function renderClientes() {
+            const tbody = document.querySelector('#tablaClientes tbody');
+            tbody.innerHTML = misClientes().map(c => `
+                <tr>
+                    <td>${c.id_cliente}</td>
+                    <td><strong>${c.nombre} ${c.apellido}</strong><br><small style="color:var(--text-300)">${c.email || ''}</small></td>
+                    <td>${c.documento || '-'}</td>
+                    <td>${c.telefono || '-'}</td>
+                    <td>${rutinaActual(c.id_cliente)}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="5" style="text-align:center;color:#888">Aún no tienes clientes asignados</td></tr>';
+        }
+
+        function renderAsig() {
+            const tbody = document.querySelector('#tablaAsig tbody');
+            tbody.innerHTML = misAsig().map(a => `
+                <tr>
+                    <td>${a.id}</td>
+                    <td><strong>${nombreCliente(a.cliente_id)}</strong></td>
+                    <td>${nombreRutina(a.rutina_id)}</td>
+                    <td>${formatoFecha(a.fecha_inicio)}</td>
+                    <td>${a.fecha_fin ? formatoFecha(a.fecha_fin) : '-'}</td>
+                    <td><span class="badge-estado ${a.estado === 'activa' ? 'activo' : 'inactivo'}">${a.estado}</span></td>
+                    <td>${(a.notas || '').substring(0, 40)}${(a.notas || '').length > 40 ? '…' : ''}</td>
+                    <td class="acciones">
+                        <button onclick="editar(${a.id})" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-del" onclick="eliminar(${a.id})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="8" style="text-align:center;color:#888">Sin rutinas asignadas</td></tr>';
+        }
+
+        function llenarSelects() {
+            document.getElementById('selCli').innerHTML = '<option value="">-- Cliente --</option>' +
+                misClientes().map(c => `<option value="${c.id_cliente}">${c.nombre} ${c.apellido}</option>`).join('');
+            document.getElementById('selRut').innerHTML = '<option value="">-- Rutina --</option>' +
+                getRutinas().map(r => `<option value="${r.id_rutina}">${r.nombre} (${r.nivel})</option>`).join('');
+        }
+
+        function abrirAsignar() {
+            if (!misClientes().length) return toast('No tienes clientes asignados todavía', 'info');
+            const f = document.getElementById('formRut');
+            f.reset(); f.id.value = '';
+            llenarSelects();
+            f.fecha_inicio.value = new Date().toISOString().substring(0, 10);
+            document.getElementById('modalTit').textContent = 'Asignar rutina';
+            abrirModal('modalRut');
+        }
+
+        function editar(id) {
+            const a = misAsig().find(x => x.id === id);
+            if (!a) return;
+            llenarSelects();
+            const f = document.getElementById('formRut');
+            f.id.value           = a.id;
+            f.cliente_id.value   = a.cliente_id;
+            f.rutina_id.value    = a.rutina_id;
+            f.fecha_inicio.value = a.fecha_inicio;
+            f.fecha_fin.value    = a.fecha_fin || '';
+            f.estado.value       = a.estado;
+            f.notas.value        = a.notas || '';
+            document.getElementById('modalTit').textContent = 'Editar asignación';
+            abrirModal('modalRut');
+        }
+
+        function eliminar(id) {
+            if (!confirm('¿Eliminar esta asignación?')) return;
+            storeAsig.save(storeAsig.all().filter(a => a.id !== id));
+            toast('Asignación eliminada', 'ok');
+            renderTodo();
+        }
+
+        document.getElementById('formRut').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const datos = Object.fromEntries(new FormData(e.target));
+            ['cliente_id', 'rutina_id'].forEach(k => datos[k] = Number(datos[k]));
+            datos.entrenador_id = ENTRENADOR_ID; // el entrenador solo asigna a su nombre
+            const lista = storeAsig.all();
+            if (datos.id) {
+                const i = lista.findIndex(a => a.id === Number(datos.id));
+                if (i >= 0) lista[i] = { ...lista[i], ...datos, id: lista[i].id };
+            } else {
+                datos.id = storeAsig.nextId('id');
+                lista.push(datos);
+            }
+            storeAsig.save(lista);
+            toast('Rutina asignada', 'ok');
+            cerrarModal('modalRut');
+            renderTodo();
+        });
+
+        function renderTodo() { renderKPIs(); renderClientes(); renderAsig(); }
+
+        filtrarTabla('buscar', 'tablaAsig');
+        renderTodo();
+    </script>
+</body>
+</html>

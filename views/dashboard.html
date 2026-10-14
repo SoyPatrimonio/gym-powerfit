@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - PowerFit Admin</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+
+    <div class="dashboard-layout">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a href="dashboard.html" class="logo">
+                <i class="fa-solid fa-dumbbell"></i>
+                <span>Power<strong>Fit</strong></span>
+            </a>
+            <nav>
+                <a href="dashboard.html" class="activo"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+                <a href="clientes.html"><i class="fa-solid fa-users"></i> Clientes</a>
+                <a href="personal.html"><i class="fa-solid fa-user-tie"></i> Personal</a>
+                <a href="membresias.html"><i class="fa-solid fa-id-card"></i> Membresías</a>
+                <a href="pagos.html"><i class="fa-solid fa-credit-card"></i> Pagos</a>
+                <a href="productos.html"><i class="fa-solid fa-bottle-water"></i> Productos</a>
+                <a href="reservas.html"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+                <a href="rutinas.html"><i class="fa-solid fa-clipboard-list"></i> Rutinas</a>
+                <a href="planes-nutricionales.html"><i class="fa-solid fa-apple-whole"></i> Nutrición</a>
+                <a href="asignaciones.html"><i class="fa-solid fa-link"></i> Asignaciones</a>
+                <a href="mediciones.html"><i class="fa-solid fa-weight-scale"></i> Mediciones</a>
+                <a href="asistencias.html"><i class="fa-solid fa-door-open"></i> Asistencias</a>
+                <a href="reportes.html"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+                <a href="#" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+            </nav>
+        </aside>
+
+        <!-- Main -->
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Panel administrativo</h1>
+                <div style="display:flex;gap:0.6rem;align-items:center">
+                    <button class="theme-toggle" title="Cambiar tema"><i class="fa-solid fa-sun"></i></button>
+                    <div class="user-chip">
+                        <i class="fa-solid fa-user-circle"></i>
+                        <span id="userName">Cargando...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones rápidas -->
+            <div class="quick-actions">
+                <a href="clientes.html" class="quick-card">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Nuevo cliente</span>
+                </a>
+                <a href="personal.html" class="quick-card">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <span>Personal</span>
+                </a>
+                <a href="asignaciones.html" class="quick-card">
+                    <i class="fa-solid fa-link"></i>
+                    <span>Asignar rutina</span>
+                </a>
+                <a href="mediciones.html" class="quick-card">
+                    <i class="fa-solid fa-weight-scale"></i>
+                    <span>Medir progreso</span>
+                </a>
+                <a href="pagos.html" class="quick-card">
+                    <i class="fa-solid fa-money-bill-trend-up"></i>
+                    <span>Registrar pago</span>
+                </a>
+                <a href="reservas.html" class="quick-card">
+                    <i class="fa-solid fa-calendar-plus"></i>
+                    <span>Nueva reserva</span>
+                </a>
+                <a href="asistencias.html" class="quick-card">
+                    <i class="fa-solid fa-qrcode"></i>
+                    <span>Check-in</span>
+                </a>
+                <a href="reportes.html" class="quick-card">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Ver reportes</span>
+                </a>
+            </div>
+
+            <!-- KPIs -->
+            <div class="kpi-grid">
+                <div class="kpi">
+                    <h4>Clientes activos</h4>
+                    <div class="valor" id="kpiClientes">--</div>
+                </div>
+                <div class="kpi success">
+                    <h4>Ingresos del mes</h4>
+                    <div class="valor" id="kpiIngresos">--</div>
+                </div>
+                <div class="kpi info">
+                    <h4>Transacciones del mes</h4>
+                    <div class="valor" id="kpiTransacciones">--</div>
+                </div>
+                <div class="kpi warning">
+                    <h4>Membresías activas</h4>
+                    <div class="valor" id="kpiMembresias">--</div>
+                </div>
+            </div>
+
+            <!-- Resumen visual -->
+            <div class="grid grid-2" style="gap:1.5rem;margin-bottom:1.5rem">
+                <div class="card">
+                    <h3 style="margin-bottom:1rem">Ingresos últimos 6 meses (COP)</h3>
+                    <canvas id="chartIngresos" height="160"></canvas>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom:1rem">Métodos de pago</h3>
+                    <canvas id="chartMetodos" height="160"></canvas>
+                </div>
+            </div>
+
+            <!-- Alertas: membresías por vencer -->
+            <div class="card alerta-card" style="margin-bottom:1.5rem">
+                <h3 style="margin-bottom:1rem"><i class="fa-solid fa-bell" style="color:var(--warning)"></i> Membresías próximas a vencer</h3>
+                <div id="listaVencer" class="vencer-lista"></div>
+            </div>
+
+            <!-- Últimos pagos -->
+            <div class="tabla-wrap">
+                <div class="tabla-tools">
+                    <h3 style="margin:0">Últimos pagos registrados</h3>
+                    <button class="btn btn-ghost" onclick="exportarCSV('tablaUltimosPagos','ultimos_pagos.csv')">
+                        <i class="fa-solid fa-file-csv"></i> Exportar CSV
+                    </button>
+                </div>
+                <table class="data" id="tablaUltimosPagos">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Membresía</th>
+                            <th>Monto</th>
+                            <th>Método</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="../js/script.js"></script>
+    <script>
+        // Solo admin/recepción: entrenadores y clientes van a su portal
+        if (!requireRol(['admin', 'recepcion'])) throw new Error('redirect');
+
+        // Carga inicial del dashboard
+        (async () => {
+            const tbody = document.querySelector('#tablaUltimosPagos tbody');
+
+            // KPIs en paralelo
+            const [clientes, pagos, membresias] = await Promise.all([
+                api('../php/clientes.php?accion=reporte_activos'),
+                api('../php/pagos.php?accion=reporte_mes'),
+                api('../php/membresias.php?accion=reporte_activas')
+            ]);
+
+            if (clientes.ok)   document.getElementById('kpiClientes').textContent     = clientes.datos.total ?? 0;
+            if (pagos.ok) {
+                document.getElementById('kpiIngresos').textContent     = formatoMoneda(pagos.datos.total);
+                document.getElementById('kpiTransacciones').textContent = pagos.datos.transacciones ?? 0;
+            }
+            if (membresias.ok) document.getElementById('kpiMembresias').textContent   = membresias.datos.total ?? 0;
+
+            // Últimos pagos
+            const lista = await api('../php/pagos.php?accion=listar');
+            let pagosDatos = [];
+            if (lista.ok && Array.isArray(lista.datos)) {
+                pagosDatos = lista.datos;
+                tbody.innerHTML = lista.datos.slice(0, 6).map(p => `
+                    <tr>
+                        <td>${p.cliente}</td>
+                        <td>${p.membresia}</td>
+                        <td>${formatoMoneda(p.monto)}</td>
+                        <td>${p.metodo_pago}</td>
+                        <td>${formatoFecha(p.fecha_pago)}</td>
+                    </tr>
+                `).join('') || '<tr><td colspan="5" style="text-align:center;color:#888">Sin datos</td></tr>';
+                document.getElementById('userName').textContent = 'Administrador';
+            } else if (!lista.ok && lista.mensaje === 'Sesión no iniciada') {
+                window.location.href = '../index.html';
+                return;
+            } else {
+                // Fallback demo (sin backend disponible)
+                pagosDatos = [
+                    { cliente:'Juan Carlos', membresia:'Mensual',    monto:80000,  metodo_pago:'Efectivo',      fecha_pago:'2026-05-01' },
+                    { cliente:'María José',  membresia:'Trimestral', monto:210000, metodo_pago:'Transferencia', fecha_pago:'2026-04-15' },
+                    { cliente:'Luis Andrés', membresia:'Mensual',    monto:80000,  metodo_pago:'Tarjeta',       fecha_pago:'2026-05-10' },
+                    { cliente:'Ana Lucía',   membresia:'Anual',      monto:720000, metodo_pago:'Transferencia', fecha_pago:'2026-01-01' },
+                    { cliente:'María José',  membresia:'Mensual',    monto:80000,  metodo_pago:'Nequi',         fecha_pago:'2026-05-15' },
+                    { cliente:'Juan Carlos', membresia:'Mensual',    monto:80000,  metodo_pago:'Daviplata',     fecha_pago:'2026-04-01' }
+                ];
+                tbody.innerHTML = pagosDatos.map(p => `
+                    <tr>
+                        <td>${p.cliente}</td>
+                        <td>${p.membresia}</td>
+                        <td>${formatoMoneda(p.monto)}</td>
+                        <td>${p.metodo_pago}</td>
+                        <td>${formatoFecha(p.fecha_pago)}</td>
+                    </tr>
+                `).join('');
+                // KPIs fallback
+                if (!clientes.ok) document.getElementById('kpiClientes').textContent     = 4;
+                if (!pagos.ok) {
+                    document.getElementById('kpiIngresos').textContent     = formatoMoneda(pagosDatos.reduce((s,p)=>s+Number(p.monto),0));
+                    document.getElementById('kpiTransacciones').textContent = pagosDatos.length;
+                }
+                if (!membresias.ok) document.getElementById('kpiMembresias').textContent = 8;
+                document.getElementById('userName').textContent = 'Administrador';
+            }
+
+            // ===== Gráficos =====
+            if (typeof Chart !== 'undefined') {
+                // Ingresos por mes (últimos 6)
+                const meses = [];
+                const totalesMes = {};
+                const ahora = new Date();
+                for (let i = 5; i >= 0; i--) {
+                    const d = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
+                    const key = d.toLocaleDateString('es-CO', { month: 'short', year: '2-digit' });
+                    meses.push(key);
+                    totalesMes[key] = 0;
+                }
+                pagosDatos.forEach(p => {
+                    const d = new Date(p.fecha_pago);
+                    const key = d.toLocaleDateString('es-CO', { month: 'short', year: '2-digit' });
+                    if (totalesMes[key] !== undefined) totalesMes[key] += Number(p.monto || 0);
+                });
+
+                new Chart(document.getElementById('chartIngresos'), {
+                    type: 'bar',
+                    data: {
+                        labels: meses,
+                        datasets: [{
+                            label: 'Ingresos (COP)',
+                            data: meses.map(m => totalesMes[m]),
+                            backgroundColor: 'rgba(255, 61, 46, 0.7)',
+                            borderColor: '#ff3d2e',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: (ctx) => formatoMoneda(ctx.parsed.y) } }
+                        },
+                        scales: {
+                            y: { ticks: { callback: (v) => '$' + (v/1000) + 'k' } }
+                        }
+                    }
+                });
+
+                // Métodos de pago
+                const metodos = {};
+                pagosDatos.forEach(p => {
+                    metodos[p.metodo_pago] = (metodos[p.metodo_pago] || 0) + 1;
+                });
+                new Chart(document.getElementById('chartMetodos'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(metodos),
+                        datasets: [{
+                            data: Object.values(metodos),
+                            backgroundColor: ['#ff3d2e','#ff8a00','#18c964','#3b82f6','#a855f7','#f5a524']
+                        }]
+                    },
+                    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+                });
+            }
+
+            // ===== Membresías por vencer (próximos 7 días - demo) =====
+            const ahora = new Date();
+            const en = (n) => { const d = new Date(); d.setDate(ahora.getDate() + n); return d; };
+            const porVencer = [
+                { cliente:'Juan Carlos Pérez',  plan:'Mensual',    vence: en(2),  tel:'320 123 4567' },
+                { cliente:'Luis Andrés Castro', plan:'Mensual',    vence: en(4),  tel:'301 345 6789' },
+                { cliente:'María José López',   plan:'Trimestral', vence: en(7),  tel:'311 234 5678' },
+                { cliente:'Carolina Mejía',     plan:'Mensual',    vence: en(1),  tel:'318 765 4321' }
+            ];
+            const cont = document.getElementById('listaVencer');
+            cont.innerHTML = porVencer.map(v => {
+                const dias = Math.ceil((v.vence - ahora) / 86400000);
+                const urgente = dias <= 3;
+                return `
+                    <div class="vencer-item ${urgente ? 'urgente' : ''}">
+                        <div>
+                            <strong>${v.cliente}</strong>
+                            <small>${v.plan} · ${v.tel}</small>
+                        </div>
+                        <div class="vencer-dias">
+                            <span class="badge-estado ${urgente ? 'inactivo' : 'activo'}">en ${dias} día${dias!==1?'s':''}</span>
+                            <a class="btn btn-sm btn-ghost" href="https://wa.me/57${v.tel.replace(/\s/g,'')}" target="_blank" title="WhatsApp">
+                                <i class="fa-brands fa-whatsapp"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        })();
+    </script>
+</body>
+</html>

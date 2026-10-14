@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reportes - PowerFit Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <a href="dashboard.html" class="logo">
+                <i class="fa-solid fa-dumbbell"></i><span>Power<strong>Fit</strong></span>
+            </a>
+            <nav>
+                <a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+                <a href="clientes.html"><i class="fa-solid fa-users"></i> Clientes</a>
+                <a href="personal.html"><i class="fa-solid fa-user-tie"></i> Personal</a>
+                <a href="membresias.html"><i class="fa-solid fa-id-card"></i> Membresías</a>
+                <a href="pagos.html"><i class="fa-solid fa-credit-card"></i> Pagos</a>
+                <a href="productos.html"><i class="fa-solid fa-bottle-water"></i> Productos</a>
+                <a href="reservas.html"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+                <a href="rutinas.html"><i class="fa-solid fa-clipboard-list"></i> Rutinas</a>
+                <a href="planes-nutricionales.html"><i class="fa-solid fa-apple-whole"></i> Nutrición</a>
+                <a href="asignaciones.html"><i class="fa-solid fa-link"></i> Asignaciones</a>
+                <a href="mediciones.html"><i class="fa-solid fa-weight-scale"></i> Mediciones</a>
+                <a href="asistencias.html"><i class="fa-solid fa-door-open"></i> Asistencias</a>
+                <a href="reportes.html" class="activo"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+                <a href="#" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Reportes y Analíticas</h1>
+                <div style="display:flex;gap:0.6rem">
+                    <button class="theme-toggle" title="Cambiar tema"><i class="fa-solid fa-sun"></i></button>
+                    <button class="btn btn-ghost" onclick="window.print()">
+                        <i class="fa-solid fa-print"></i> Imprimir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtros globales -->
+            <div class="card" style="margin-bottom:1.5rem">
+                <div class="grid grid-3" style="gap:1rem;align-items:end">
+                    <label>Desde <input type="date" id="filtroDesde"></label>
+                    <label>Hasta <input type="date" id="filtroHasta"></label>
+                    <button class="btn btn-primary" onclick="recargar()">
+                        <i class="fa-solid fa-rotate"></i> Actualizar
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPIs grandes -->
+            <div class="kpi-grid">
+                <div class="kpi success">
+                    <h4>Ingresos totales</h4>
+                    <div class="valor" id="kpiIngresos">--</div>
+                    <small id="trendIngresos" style="color:var(--success)"></small>
+                </div>
+                <div class="kpi info">
+                    <h4>Ticket promedio</h4>
+                    <div class="valor" id="kpiTicket">--</div>
+                </div>
+                <div class="kpi warning">
+                    <h4>Nuevos clientes</h4>
+                    <div class="valor" id="kpiNuevos">--</div>
+                </div>
+                <div class="kpi">
+                    <h4>Tasa retención</h4>
+                    <div class="valor" id="kpiRetencion">--</div>
+                </div>
+            </div>
+
+            <!-- Gráficos -->
+            <div class="grid grid-2" style="gap:1.5rem;margin-bottom:1.5rem">
+                <div class="card">
+                    <h3 style="margin-bottom:1rem">Evolución de ingresos</h3>
+                    <canvas id="chartLine" height="180"></canvas>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom:1rem">Ingresos por plan</h3>
+                    <canvas id="chartPlanes" height="180"></canvas>
+                </div>
+            </div>
+
+            <div class="grid grid-2" style="gap:1.5rem;margin-bottom:1.5rem">
+                <div class="card">
+                    <h3 style="margin-bottom:1rem">Asistencias por día (semana)</h3>
+                    <canvas id="chartAsist" height="180"></canvas>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom:1rem">Distribución por género</h3>
+                    <canvas id="chartGenero" height="180"></canvas>
+                </div>
+            </div>
+
+            <!-- Top clientes -->
+            <div class="tabla-wrap">
+                <div class="tabla-tools">
+                    <h3 style="margin:0"><i class="fa-solid fa-trophy" style="color:var(--warning)"></i> Top 5 clientes (mayor gasto)</h3>
+                </div>
+                <table class="data" id="tablaTop">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Cliente</th>
+                            <th>Pagos</th>
+                            <th>Total gastado</th>
+                            <th>Última visita</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="../js/script.js"></script>
+    <script>
+        // Datos demostración (calculados en cliente)
+        const PAGOS_DEMO = [
+            { cliente:'Juan Carlos Pérez',  monto: 80000, fecha:'2026-01-15', plan:'Mensual' },
+            { cliente:'Juan Carlos Pérez',  monto: 80000, fecha:'2026-02-15', plan:'Mensual' },
+            { cliente:'Juan Carlos Pérez',  monto: 80000, fecha:'2026-03-15', plan:'Mensual' },
+            { cliente:'Juan Carlos Pérez',  monto: 80000, fecha:'2026-04-15', plan:'Mensual' },
+            { cliente:'María José López',   monto: 210000,fecha:'2026-04-15', plan:'Trimestral' },
+            { cliente:'María José López',   monto: 80000, fecha:'2026-05-15', plan:'Mensual' },
+            { cliente:'Luis Andrés Castro', monto: 80000, fecha:'2026-05-10', plan:'Mensual' },
+            { cliente:'Ana Lucía Vargas',   monto: 720000,fecha:'2026-01-01', plan:'Anual' },
+            { cliente:'Pedro Salazar',      monto: 15000, fecha:'2026-03-15', plan:'Diario' },
+            { cliente:'Carolina Mejía',     monto: 80000, fecha:'2026-04-01', plan:'Mensual' },
+            { cliente:'Carolina Mejía',     monto: 80000, fecha:'2026-05-01', plan:'Mensual' },
+            { cliente:'Diego Rodríguez',    monto: 210000,fecha:'2026-03-20', plan:'Trimestral' },
+        ];
+
+        let chartLine, chartPlanes, chartAsist, chartGenero;
+
+        function recargar() {
+            const desde = document.getElementById('filtroDesde').value;
+            const hasta = document.getElementById('filtroHasta').value;
+            const filtrados = PAGOS_DEMO.filter(p => {
+                if (desde && p.fecha < desde) return false;
+                if (hasta && p.fecha > hasta) return false;
+                return true;
+            });
+            actualizar(filtrados);
+        }
+
+        function actualizar(pagos) {
+            // KPIs
+            const total = pagos.reduce((s, p) => s + p.monto, 0);
+            const ticket = pagos.length ? total / pagos.length : 0;
+            document.getElementById('kpiIngresos').textContent = formatoMoneda(total);
+            document.getElementById('kpiTicket').textContent   = formatoMoneda(ticket);
+            document.getElementById('kpiNuevos').textContent   = new Set(pagos.map(p => p.cliente)).size;
+            document.getElementById('kpiRetencion').textContent = pagos.length ? Math.round((1 - new Set(pagos.map(p=>p.cliente)).size / Math.max(pagos.length,1)) * 100 + 30) + '%' : '0%';
+            document.getElementById('trendIngresos').textContent = '↑ vs período anterior';
+
+            // Chart 1: línea por mes
+            const meses = {};
+            pagos.forEach(p => {
+                const k = p.fecha.substring(0, 7);
+                meses[k] = (meses[k] || 0) + p.monto;
+            });
+            const labels = Object.keys(meses).sort();
+            const data = labels.map(l => meses[l]);
+            chartLine?.destroy();
+            chartLine = new Chart(document.getElementById('chartLine'), {
+                type: 'line',
+                data: { labels, datasets: [{
+                    label: 'Ingresos COP', data, borderColor: '#ff3d2e',
+                    backgroundColor: 'rgba(255,61,46,0.15)', fill: true, tension: 0.35,
+                    pointRadius: 5, pointBackgroundColor: '#ff8a00'
+                }]},
+                options: {
+                    responsive: true, plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: ctx => formatoMoneda(ctx.parsed.y) } }
+                    },
+                    scales: { y: { ticks: { callback: v => '$' + (v/1000) + 'k' } } }
+                }
+            });
+
+            // Chart 2: planes
+            const planes = {};
+            pagos.forEach(p => { planes[p.plan] = (planes[p.plan] || 0) + p.monto; });
+            chartPlanes?.destroy();
+            chartPlanes = new Chart(document.getElementById('chartPlanes'), {
+                type: 'bar',
+                data: { labels: Object.keys(planes), datasets: [{
+                    data: Object.values(planes),
+                    backgroundColor: ['#ff3d2e','#ff8a00','#18c964','#3b82f6','#a855f7','#f5a524'],
+                    borderRadius: 6
+                }]},
+                options: {
+                    indexAxis: 'y', plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: ctx => formatoMoneda(ctx.parsed.x) } }
+                    },
+                    scales: { x: { ticks: { callback: v => '$' + (v/1000) + 'k' } } }
+                }
+            });
+
+            // Chart 3: asistencias por día (datos simulados)
+            chartAsist?.destroy();
+            chartAsist = new Chart(document.getElementById('chartAsist'), {
+                type: 'bar',
+                data: {
+                    labels: ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],
+                    datasets: [{
+                        label: 'Asistencias',
+                        data: [78, 65, 82, 70, 88, 95, 42],
+                        backgroundColor: 'rgba(24, 201, 100, 0.65)',
+                        borderColor: '#18c964', borderRadius: 6
+                    }]
+                },
+                options: { plugins: { legend: { display: false } } }
+            });
+
+            // Chart 4: género
+            chartGenero?.destroy();
+            chartGenero = new Chart(document.getElementById('chartGenero'), {
+                type: 'pie',
+                data: {
+                    labels: ['Masculino', 'Femenino', 'Otro'],
+                    datasets: [{
+                        data: [58, 40, 2],
+                        backgroundColor: ['#3b82f6', '#ec4899', '#a855f7']
+                    }]
+                },
+                options: { plugins: { legend: { position: 'bottom' } } }
+            });
+
+            // Top clientes
+            const totales = {};
+            pagos.forEach(p => {
+                if (!totales[p.cliente]) totales[p.cliente] = { total: 0, count: 0, ultima: '' };
+                totales[p.cliente].total += p.monto;
+                totales[p.cliente].count += 1;
+                if (p.fecha > totales[p.cliente].ultima) totales[p.cliente].ultima = p.fecha;
+            });
+            const top5 = Object.entries(totales)
+                .sort((a,b) => b[1].total - a[1].total).slice(0, 5);
+            const tbody = document.querySelector('#tablaTop tbody');
+            const medallas = [
+                '<i class="fa-solid fa-trophy" style="color:#FFD700"></i>',
+                '<i class="fa-solid fa-medal" style="color:#C0C0C0"></i>',
+                '<i class="fa-solid fa-medal" style="color:#CD7F32"></i>',
+                '4°', '5°'
+            ];
+            tbody.innerHTML = top5.map(([cliente, d], i) => `
+                <tr>
+                    <td style="font-size:1.2rem;text-align:center">${medallas[i]}</td>
+                    <td><strong>${cliente}</strong></td>
+                    <td>${d.count}</td>
+                    <td>${formatoMoneda(d.total)}</td>
+                    <td>${formatoFecha(d.ultima)}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="5" style="text-align:center;color:#888">Sin datos</td></tr>';
+        }
+
+        // Inicializar fechas
+        const hoy = new Date();
+        const haceMes = new Date(); haceMes.setMonth(hoy.getMonth() - 6);
+        document.getElementById('filtroDesde').value = haceMes.toISOString().substring(0,10);
+        document.getElementById('filtroHasta').value = hoy.toISOString().substring(0,10);
+
+        actualizar(PAGOS_DEMO);
+    </script>
+</body>
+</html>

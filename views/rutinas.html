@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rutinas - PowerFit Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <a href="dashboard.html" class="logo">
+                <i class="fa-solid fa-dumbbell"></i><span>Power<strong>Fit</strong></span>
+            </a>
+            <nav>
+                <a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+                <a href="clientes.html"><i class="fa-solid fa-users"></i> Clientes</a>
+                <a href="personal.html"><i class="fa-solid fa-user-tie"></i> Personal</a>
+                <a href="membresias.html"><i class="fa-solid fa-id-card"></i> Membresías</a>
+                <a href="pagos.html"><i class="fa-solid fa-credit-card"></i> Pagos</a>
+                <a href="productos.html"><i class="fa-solid fa-bottle-water"></i> Productos</a>
+                <a href="reservas.html"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+                <a href="rutinas.html" class="activo"><i class="fa-solid fa-clipboard-list"></i> Rutinas</a>
+                <a href="planes-nutricionales.html"><i class="fa-solid fa-apple-whole"></i> Nutrición</a>
+                <a href="asignaciones.html"><i class="fa-solid fa-link"></i> Asignaciones</a>
+                <a href="mediciones.html"><i class="fa-solid fa-weight-scale"></i> Mediciones</a>
+                <a href="asistencias.html"><i class="fa-solid fa-door-open"></i> Asistencias</a>
+                <a href="reportes.html"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+                <a href="#" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Gestión de Rutinas</h1>
+                <div style="display:flex;gap:0.6rem">
+                    <button class="theme-toggle" title="Cambiar tema"><i class="fa-solid fa-sun"></i></button>
+                    <button class="btn btn-ghost" onclick="exportarCSV('tablaRutinas','rutinas.csv')">
+                        <i class="fa-solid fa-file-csv"></i> Exportar CSV
+                    </button>
+                    <button class="btn btn-primary" onclick="abrirNuevo()">
+                        <i class="fa-solid fa-plus"></i> Nueva rutina
+                    </button>
+                </div>
+            </div>
+
+            <div class="tabla-wrap">
+                <div class="tabla-tools">
+                    <input type="text" id="buscar" placeholder="Buscar por nombre, nivel u objetivo...">
+                    <select id="filtroNivel" class="select-inline">
+                        <option value="">Todos los niveles</option>
+                        <option>Principiante</option>
+                        <option>Intermedio</option>
+                        <option>Avanzado</option>
+                    </select>
+                </div>
+                <table class="data" id="tablaRutinas">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Nivel</th>
+                            <th>Objetivo</th>
+                            <th>Descripción</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-bg" id="modalRutina">
+        <div class="modal">
+            <button class="modal-close" onclick="cerrarModal('modalRutina')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 id="modalTitulo">Nueva rutina</h3>
+            <form class="form" id="formRutina">
+                <input type="hidden" name="id_rutina" />
+                <label>Nombre <input type="text" name="nombre" required></label>
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Nivel
+                        <select name="nivel" required>
+                            <option>Principiante</option>
+                            <option>Intermedio</option>
+                            <option>Avanzado</option>
+                        </select>
+                    </label>
+                    <label>Objetivo
+                        <select name="objetivo" required>
+                            <option>Perder grasa</option>
+                            <option>Tonificar</option>
+                            <option>Ganar masa muscular</option>
+                            <option>Ganar fuerza</option>
+                            <option>Resistencia</option>
+                            <option>Rehabilitación</option>
+                        </select>
+                    </label>
+                </div>
+                <label>Descripción
+                    <textarea name="descripcion" rows="4" placeholder="Detalle de ejercicios, series, repeticiones, días..."></textarea>
+                </label>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <small class="msg" id="msgRutina"></small>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        const tbody = document.querySelector('#tablaRutinas tbody');
+        const formRutina = document.getElementById('formRutina');
+
+        // Datos de demostración (fallback si el endpoint no existe)
+        const RUTINAS_DEMO = [
+            { id_rutina: 1, nombre: 'Full Body Principiante', nivel: 'Principiante', objetivo: 'Tonificar',           descripcion: '3 días/semana. Trabaja todos los grupos musculares con peso ligero.' },
+            { id_rutina: 2, nombre: 'Hipertrofia Push/Pull',  nivel: 'Intermedio',   objetivo: 'Ganar masa muscular', descripcion: '5 días/semana. División push-pull-legs con foco en volumen.' },
+            { id_rutina: 3, nombre: 'Cardio HIIT',            nivel: 'Intermedio',   objetivo: 'Perder grasa',        descripcion: 'Sesiones de 30 min de intervalos de alta intensidad.' },
+            { id_rutina: 4, nombre: 'Powerlifting Avanzado',  nivel: 'Avanzado',     objetivo: 'Ganar fuerza',        descripcion: 'Press banca, sentadilla y peso muerto con cargas máximas.' },
+            { id_rutina: 5, nombre: 'Funcional Mujer',        nivel: 'Principiante', objetivo: 'Tonificar',           descripcion: 'Rutina funcional enfocada en glúteos y piernas.' }
+        ];
+        // Almacén local para CRUD sin backend
+        const STORAGE_KEY = 'powerfit_rutinas';
+        const cargarStore = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') || RUTINAS_DEMO;
+        const guardarStore = (arr) => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+
+        function render(lista) {
+            tbody.innerHTML = lista.map(r => `
+                <tr>
+                    <td>${r.id_rutina}</td>
+                    <td>${r.nombre}</td>
+                    <td><span class="badge-estado ${r.nivel === 'Avanzado' ? 'inactivo' : 'activo'}">${r.nivel}</span></td>
+                    <td>${r.objetivo}</td>
+                    <td>${(r.descripcion || '').substring(0, 80)}${(r.descripcion || '').length > 80 ? '…' : ''}</td>
+                    <td class="acciones">
+                        <button onclick="editar(${r.id_rutina})" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-del" onclick="eliminar(${r.id_rutina})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="6" style="text-align:center;color:#888">Sin rutinas</td></tr>';
+        }
+
+        async function cargar() {
+            const r = await api('../php/rutinas.php?accion=listar');
+            const datos = (r && r.ok && Array.isArray(r.datos)) ? r.datos : cargarStore();
+            render(datos);
+        }
+
+        function abrirNuevo() {
+            formRutina.reset();
+            formRutina.id_rutina.value = '';
+            document.getElementById('modalTitulo').textContent = 'Nueva rutina';
+            abrirModal('modalRutina');
+        }
+
+        function editar(id) {
+            const lista = cargarStore();
+            const r = lista.find(x => x.id_rutina === id);
+            if (!r) return;
+            formRutina.id_rutina.value   = r.id_rutina;
+            formRutina.nombre.value      = r.nombre;
+            formRutina.nivel.value       = r.nivel;
+            formRutina.objetivo.value    = r.objetivo;
+            formRutina.descripcion.value = r.descripcion || '';
+            document.getElementById('modalTitulo').textContent = 'Editar rutina';
+            abrirModal('modalRutina');
+        }
+
+        function eliminar(id) {
+            if (!confirm('¿Eliminar esta rutina?')) return;
+            const lista = cargarStore().filter(r => r.id_rutina !== id);
+            guardarStore(lista);
+            toast('Rutina eliminada', 'ok');
+            render(lista);
+        }
+
+        formRutina.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const datos = Object.fromEntries(new FormData(formRutina));
+            const lista = cargarStore();
+            if (datos.id_rutina) {
+                const i = lista.findIndex(r => r.id_rutina === Number(datos.id_rutina));
+                if (i >= 0) lista[i] = { ...lista[i], ...datos, id_rutina: lista[i].id_rutina };
+            } else {
+                const nuevoId = lista.length ? Math.max(...lista.map(r => r.id_rutina)) + 1 : 1;
+                lista.push({ ...datos, id_rutina: nuevoId });
+            }
+            guardarStore(lista);
+            toast('Rutina guardada', 'ok');
+            cerrarModal('modalRutina');
+            render(lista);
+        });
+
+        // Filtros
+        document.getElementById('filtroNivel').addEventListener('change', (e) => {
+            const nivel = e.target.value;
+            const lista = cargarStore().filter(r => !nivel || r.nivel === nivel);
+            render(lista);
+        });
+
+        filtrarTabla('buscar', 'tablaRutinas');
+        cargar();
+    </script>
+</body>
+</html>

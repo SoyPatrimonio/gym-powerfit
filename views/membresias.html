@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Membresías - PowerFit Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <a href="dashboard.html" class="logo">
+                <i class="fa-solid fa-dumbbell"></i><span>Power<strong>Fit</strong></span>
+            </a>
+            <nav>
+                <a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+                <a href="clientes.html"><i class="fa-solid fa-users"></i> Clientes</a>
+                <a href="personal.html"><i class="fa-solid fa-user-tie"></i> Personal</a>
+                <a href="membresias.html" class="activo"><i class="fa-solid fa-id-card"></i> Membresías</a>
+                <a href="pagos.html"><i class="fa-solid fa-credit-card"></i> Pagos</a>
+                <a href="productos.html"><i class="fa-solid fa-bottle-water"></i> Productos</a>
+                <a href="reservas.html"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+                <a href="rutinas.html"><i class="fa-solid fa-clipboard-list"></i> Rutinas</a>
+                <a href="planes-nutricionales.html"><i class="fa-solid fa-apple-whole"></i> Nutrición</a>
+                <a href="asignaciones.html"><i class="fa-solid fa-link"></i> Asignaciones</a>
+                <a href="mediciones.html"><i class="fa-solid fa-weight-scale"></i> Mediciones</a>
+                <a href="asistencias.html"><i class="fa-solid fa-door-open"></i> Asistencias</a>
+                <a href="reportes.html"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+                <a href="#" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Gestión de Membresías</h1>
+                <div style="display:flex;gap:0.6rem">
+                    <button class="theme-toggle" title="Cambiar tema"><i class="fa-solid fa-sun"></i></button>
+                    <button class="btn btn-ghost" onclick="exportarCSV('tablaMembresias','membresias.csv')">
+                        <i class="fa-solid fa-file-csv"></i> Exportar CSV
+                    </button>
+                    <button class="btn btn-primary" onclick="abrirNuevo()">
+                        <i class="fa-solid fa-plus"></i> Nueva membresía
+                    </button>
+                </div>
+            </div>
+
+            <div class="tabla-wrap">
+                <div class="tabla-tools">
+                    <input type="text" id="buscar" placeholder="Buscar membresía...">
+                </div>
+                <table class="data" id="tablaMembresias">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Duración (meses)</th>
+                            <th>Precio</th>
+                            <th>Incluye clases</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-bg" id="modalMem">
+        <div class="modal">
+            <button class="modal-close" onclick="cerrarModal('modalMem')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 id="modalTitulo">Nueva membresía</h3>
+            <form class="form" id="formMem">
+                <input type="hidden" name="id_membresia" />
+                <label>Nombre <input type="text" name="nombre" required></label>
+                <label>Descripción <textarea name="descripcion" rows="3"></textarea></label>
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Duración (meses) <input type="number" name="duracion_meses" min="1" required></label>
+                    <label>Precio (COP) <input type="number" name="precio" step="1000" min="0" required placeholder="80000"></label>
+                </div>
+                <label style="flex-direction:row;align-items:center;gap:0.6rem">
+                    <input type="checkbox" name="incluye_clases" checked> Incluye clases grupales
+                </label>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <small class="msg" id="msgMem"></small>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        const tbody = document.querySelector('#tablaMembresias tbody');
+        const formMem = document.getElementById('formMem');
+
+        const DEMO_MEMBRESIAS = [
+            { id_membresia:1, nombre:'Plan Diario',     descripcion:'Acceso a la sala por un día.',                          duracion_meses:1,  precio:15000,  incluye_clases:0 },
+            { id_membresia:2, nombre:'Plan Mensual',    descripcion:'Membresía mensual con acceso completo.',                duracion_meses:1,  precio:80000,  incluye_clases:1 },
+            { id_membresia:3, nombre:'Plan Trimestral', descripcion:'3 meses con clases grupales incluidas.',                duracion_meses:3,  precio:210000, incluye_clases:1 },
+            { id_membresia:4, nombre:'Plan Semestral',  descripcion:'6 meses + asesoría nutricional incluida.',              duracion_meses:6,  precio:390000, incluye_clases:1 },
+            { id_membresia:5, nombre:'Plan Anual',      descripcion:'Membresía anual con todos los beneficios y descuento.', duracion_meses:12, precio:720000, incluye_clases:1 },
+            { id_membresia:6, nombre:'Plan Estudiante', descripcion:'Plan mensual con descuento por carnet estudiantil.',    duracion_meses:1,  precio:60000,  incluye_clases:1 },
+            { id_membresia:7, nombre:'Plan Pareja',     descripcion:'Plan mensual para 2 personas.',                         duracion_meses:1,  precio:140000, incluye_clases:1 }
+        ];
+        const store = demoStore('powerfit_membresias', DEMO_MEMBRESIAS);
+        let MODO_DEMO = false;
+
+        function render(lista) {
+            tbody.innerHTML = lista.map(m => `
+                <tr>
+                    <td>${m.id_membresia}</td>
+                    <td>${m.nombre}</td>
+                    <td>${m.descripcion || '-'}</td>
+                    <td>${m.duracion_meses}</td>
+                    <td>${formatoMoneda(m.precio)}</td>
+                    <td><span class="badge-estado ${m.incluye_clases == 1 ? 'activo' : 'inactivo'}">${m.incluye_clases == 1 ? 'Sí' : 'No'}</span></td>
+                    <td class="acciones">
+                        <button onclick="editar(${m.id_membresia})" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-del" onclick="eliminar(${m.id_membresia})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="7" style="text-align:center;color:#888">Sin registros</td></tr>';
+        }
+
+        async function cargar() {
+            const r = await api('../php/membresias.php?accion=listar');
+            if (r.ok && Array.isArray(r.datos)) {
+                MODO_DEMO = false;
+                render(r.datos);
+                return;
+            }
+            MODO_DEMO = true;
+            render(store.all());
+        }
+
+        function abrirNuevo() {
+            formMem.reset();
+            formMem.id_membresia.value = '';
+            formMem.incluye_clases.checked = true;
+            document.getElementById('modalTitulo').textContent = 'Nueva membresía';
+            abrirModal('modalMem');
+        }
+
+        async function editar(id) {
+            if (MODO_DEMO) {
+                const m = store.all().find(x => x.id_membresia === id);
+                if (!m) return;
+                formMem.id_membresia.value     = m.id_membresia;
+                formMem.nombre.value           = m.nombre;
+                formMem.descripcion.value      = m.descripcion || '';
+                formMem.duracion_meses.value   = m.duracion_meses;
+                formMem.precio.value           = m.precio;
+                formMem.incluye_clases.checked = m.incluye_clases == 1;
+                document.getElementById('modalTitulo').textContent = 'Editar membresía';
+                abrirModal('modalMem');
+                return;
+            }
+            const r = await api('../php/membresias.php?accion=obtener&id=' + id);
+            if (!r.ok) return toast(r.mensaje, 'error');
+            const m = r.datos;
+            formMem.id_membresia.value      = m.id_membresia;
+            formMem.nombre.value            = m.nombre;
+            formMem.descripcion.value       = m.descripcion || '';
+            formMem.duracion_meses.value    = m.duracion_meses;
+            formMem.precio.value            = m.precio;
+            formMem.incluye_clases.checked  = m.incluye_clases == 1;
+            document.getElementById('modalTitulo').textContent = 'Editar membresía';
+            abrirModal('modalMem');
+        }
+
+        async function eliminar(id) {
+            if (!confirm('¿Eliminar esta membresía?')) return;
+            if (MODO_DEMO) {
+                const lista = store.all().filter(m => m.id_membresia !== id);
+                store.save(lista);
+                toast('Membresía eliminada', 'ok');
+                render(lista);
+                return;
+            }
+            const r = await api('../php/membresias.php?accion=eliminar', { id_membresia: id });
+            toast(r.mensaje, r.ok ? 'ok' : 'error');
+            if (r.ok) cargar();
+        }
+
+        formMem.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msg = document.getElementById('msgMem');
+            const datos = Object.fromEntries(new FormData(formMem));
+            datos.incluye_clases = formMem.incluye_clases.checked ? 1 : 0;
+            datos.duracion_meses = Number(datos.duracion_meses);
+            datos.precio = Number(datos.precio);
+
+            if (MODO_DEMO) {
+                const lista = store.all();
+                if (datos.id_membresia) {
+                    const i = lista.findIndex(m => m.id_membresia === Number(datos.id_membresia));
+                    if (i >= 0) lista[i] = { ...lista[i], ...datos, id_membresia: lista[i].id_membresia };
+                } else {
+                    datos.id_membresia = store.nextId('id_membresia');
+                    lista.push(datos);
+                }
+                store.save(lista);
+                msg.textContent = 'Membresía guardada';
+                msg.className = 'msg ok';
+                setTimeout(() => { cerrarModal('modalMem'); render(store.all()); }, 500);
+                return;
+            }
+
+            const accion = datos.id_membresia ? 'actualizar' : 'crear';
+            const r = await api('../php/membresias.php?accion=' + accion, datos);
+            msg.textContent = r.mensaje;
+            msg.className = 'msg ' + (r.ok ? 'ok' : 'error');
+            if (r.ok) setTimeout(() => { cerrarModal('modalMem'); cargar(); }, 600);
+        });
+
+        filtrarTabla('buscar', 'tablaMembresias');
+        cargar();
+    </script>
+</body>
+</html>

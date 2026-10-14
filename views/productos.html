@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Productos - PowerFit Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <a href="dashboard.html" class="logo">
+                <i class="fa-solid fa-dumbbell"></i><span>Power<strong>Fit</strong></span>
+            </a>
+            <nav>
+                <a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+                <a href="clientes.html"><i class="fa-solid fa-users"></i> Clientes</a>
+                <a href="personal.html"><i class="fa-solid fa-user-tie"></i> Personal</a>
+                <a href="membresias.html"><i class="fa-solid fa-id-card"></i> Membresías</a>
+                <a href="pagos.html"><i class="fa-solid fa-credit-card"></i> Pagos</a>
+                <a href="productos.html" class="activo"><i class="fa-solid fa-bottle-water"></i> Productos</a>
+                <a href="reservas.html"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+                <a href="rutinas.html"><i class="fa-solid fa-clipboard-list"></i> Rutinas</a>
+                <a href="planes-nutricionales.html"><i class="fa-solid fa-apple-whole"></i> Nutrición</a>
+                <a href="asignaciones.html"><i class="fa-solid fa-link"></i> Asignaciones</a>
+                <a href="mediciones.html"><i class="fa-solid fa-weight-scale"></i> Mediciones</a>
+                <a href="asistencias.html"><i class="fa-solid fa-door-open"></i> Asistencias</a>
+                <a href="reportes.html"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+                <a href="#" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Tienda - Productos</h1>
+                <div style="display:flex;gap:0.6rem">
+                    <button class="theme-toggle" title="Cambiar tema"><i class="fa-solid fa-sun"></i></button>
+                    <button class="btn btn-ghost" onclick="exportarCSV('tablaProductos','productos.csv')">
+                        <i class="fa-solid fa-file-csv"></i> Exportar
+                    </button>
+                    <button class="btn btn-primary" onclick="abrirNuevo()">
+                        <i class="fa-solid fa-plus"></i> Nuevo producto
+                    </button>
+                </div>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi"><h4>Total productos</h4><div class="valor" id="kpiTotal">0</div></div>
+                <div class="kpi success"><h4>Valor en inventario</h4><div class="valor" id="kpiValor">--</div></div>
+                <div class="kpi warning"><h4>Stock bajo (≤5)</h4><div class="valor" id="kpiStockBajo">0</div></div>
+                <div class="kpi info"><h4>Categorías</h4><div class="valor" id="kpiCats">0</div></div>
+            </div>
+
+            <div class="tabla-wrap">
+                <div class="tabla-tools">
+                    <input type="text" id="buscar" placeholder="Buscar por nombre o marca...">
+                    <select id="filtroCat" class="select-inline">
+                        <option value="">Todas las categorías</option>
+                        <option>Suplementos</option>
+                        <option>Ropa</option>
+                        <option>Accesorios</option>
+                        <option>Equipos</option>
+                        <option>Bebidas</option>
+                    </select>
+                </div>
+                <table class="data" id="tablaProductos">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Producto</th>
+                            <th>Marca</th>
+                            <th>Categoría</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-bg" id="modalProd">
+        <div class="modal">
+            <button class="modal-close" onclick="cerrarModal('modalProd')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 id="modalTitulo">Nuevo producto</h3>
+            <form class="form" id="formProd">
+                <input type="hidden" name="id" />
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Nombre <input type="text" name="nombre" required></label>
+                    <label>Marca <input type="text" name="marca"></label>
+                </div>
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Categoría
+                        <select name="categoria" required>
+                            <option>Suplementos</option>
+                            <option>Ropa</option>
+                            <option>Accesorios</option>
+                            <option>Equipos</option>
+                            <option>Bebidas</option>
+                        </select>
+                    </label>
+                    <label>Precio (COP) <input type="number" name="precio" step="500" min="0" required placeholder="120000"></label>
+                </div>
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Stock <input type="number" name="stock" min="0" required></label>
+                    <label>Estado
+                        <select name="estado">
+                            <option value="activo">Disponible</option>
+                            <option value="inactivo">No disponible</option>
+                        </select>
+                    </label>
+                </div>
+                <label>Descripción <textarea name="descripcion" rows="3"></textarea></label>
+                <label>Imagen (URL o ruta) <input type="text" name="imagen" placeholder="../img/productos/mi-producto.jpg"></label>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <small class="msg" id="msgProd"></small>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        const STORAGE_KEY = 'powerfit_productos';
+        const tbody = document.querySelector('#tablaProductos tbody');
+        const formProd = document.getElementById('formProd');
+
+        const DEMO = [
+            { id:1, nombre:'Whey Protein 2lb',     marca:'Optimum Nutrition', categoria:'Suplementos', precio:185000, stock:24, estado:'activo',   descripcion:'Proteína suero 2 libras, sabor chocolate.', imagen:'' },
+            { id:2, nombre:'Creatina 300g',         marca:'MuscleTech',        categoria:'Suplementos', precio:95000,  stock:18, estado:'activo',   descripcion:'Creatina monohidratada micronizada.', imagen:'' },
+            { id:3, nombre:'Camiseta PowerFit',    marca:'PowerFit',          categoria:'Ropa',         precio:55000,  stock:40, estado:'activo',   descripcion:'Dry-fit unisex tallas S a XL.', imagen:'' },
+            { id:4, nombre:'Guantes entrenamiento', marca:'Harbinger',         categoria:'Accesorios',  precio:75000,  stock:3,  estado:'activo',   descripcion:'Guantes con muñequera reforzada.', imagen:'../img/productos/guantes-training.jpg' },
+            { id:5, nombre:'Shaker 600ml',          marca:'PowerFit',          categoria:'Accesorios',  precio:25000,  stock:60, estado:'activo',   descripcion:'Vaso mezclador con bola de acero.', imagen:'../img/productos/shaker-600ml.jpg' },
+            { id:6, nombre:'Banda elástica fuerte', marca:'Iron Bull',         categoria:'Equipos',     precio:45000,  stock:15, estado:'activo',   descripcion:'Banda de resistencia 25-65 lb.', imagen:'../img/productos/banda-elastica.jpg' },
+            { id:7, nombre:'Pre-entreno C4',        marca:'Cellucor',          categoria:'Suplementos', precio:165000, stock:5,  estado:'activo',   descripcion:'30 servicios sabor frutos rojos.', imagen:'../img/productos/pre-entreno-c4.jpg' },
+            { id:8, nombre:'Bebida hidratante',     marca:'Powerade',          categoria:'Bebidas',     precio:6500,   stock:120,estado:'activo',   descripcion:'500ml sabor mora.', imagen:'../img/productos/bebida-hidratante.jpg' }
+        ];
+
+        const cargarStore = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') || DEMO;
+        const guardarStore = (arr) => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+
+        // Rellena las imágenes en datos ya guardados en localStorage (versiones previas sin foto)
+        function migrarImagenes() {
+            const guardado = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+            if (!guardado) return; // aún no hay store: se usará DEMO con imágenes
+            let cambio = false;
+            guardado.forEach(p => {
+                if (!p.imagen) {
+                    const base = DEMO.find(d => d.id === p.id || d.nombre === p.nombre);
+                    if (base && base.imagen) { p.imagen = base.imagen; cambio = true; }
+                }
+            });
+            if (cambio) guardarStore(guardado);
+        }
+
+        function actualizarKPIs(lista) {
+            document.getElementById('kpiTotal').textContent     = lista.length;
+            document.getElementById('kpiValor').textContent     = formatoMoneda(lista.reduce((s, p) => s + p.precio * p.stock, 0));
+            document.getElementById('kpiStockBajo').textContent = lista.filter(p => p.stock <= 5).length;
+            document.getElementById('kpiCats').textContent      = new Set(lista.map(p => p.categoria)).size;
+        }
+
+        function render() {
+            const lista = cargarStore();
+            const cat = document.getElementById('filtroCat').value;
+            const visibles = lista.filter(p => !cat || p.categoria === cat);
+            tbody.innerHTML = visibles.map(p => `
+                <tr>
+                    <td>${p.id}</td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:0.75rem">
+                            ${p.imagen
+                                ? `<img src="${p.imagen}" alt="${p.nombre}" loading="lazy" style="width:46px;height:46px;border-radius:10px;object-fit:cover;flex:none;box-shadow:0 1px 4px rgba(0,0,0,.15)">`
+                                : `<span style="width:46px;height:46px;border-radius:10px;flex:none;display:grid;place-items:center;background:var(--bg-200,#eee);color:var(--text-300,#999)"><i class="fa-solid fa-image"></i></span>`}
+                            <span><strong>${p.nombre}</strong><br><small style="color:var(--text-300)">${p.descripcion || ''}</small></span>
+                        </div>
+                    </td>
+                    <td>${p.marca || '-'}</td>
+                    <td>${p.categoria}</td>
+                    <td>${formatoMoneda(p.precio)}</td>
+                    <td><span class="badge-estado ${p.stock <= 5 ? 'inactivo' : 'activo'}">${p.stock} unidades</span></td>
+                    <td><span class="badge-estado ${p.estado === 'activo' ? 'activo' : 'inactivo'}">${p.estado === 'activo' ? 'Disponible' : 'Agotado'}</span></td>
+                    <td class="acciones">
+                        <button onclick="editar(${p.id})" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-del" onclick="eliminar(${p.id})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="8" style="text-align:center;color:#888">Sin productos</td></tr>';
+            actualizarKPIs(lista);
+        }
+
+        function abrirNuevo() {
+            formProd.reset();
+            formProd.id.value = '';
+            document.getElementById('modalTitulo').textContent = 'Nuevo producto';
+            abrirModal('modalProd');
+        }
+
+        function editar(id) {
+            const p = cargarStore().find(x => x.id === id);
+            if (!p) return;
+            formProd.id.value          = p.id;
+            formProd.nombre.value      = p.nombre;
+            formProd.marca.value       = p.marca || '';
+            formProd.categoria.value   = p.categoria;
+            formProd.precio.value      = p.precio;
+            formProd.stock.value       = p.stock;
+            formProd.estado.value      = p.estado;
+            formProd.descripcion.value = p.descripcion || '';
+            formProd.imagen.value      = p.imagen || '';
+            document.getElementById('modalTitulo').textContent = 'Editar producto';
+            abrirModal('modalProd');
+        }
+
+        function eliminar(id) {
+            if (!confirm('¿Eliminar este producto?')) return;
+            guardarStore(cargarStore().filter(p => p.id !== id));
+            toast('Producto eliminado', 'ok');
+            render();
+        }
+
+        formProd.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const datos = Object.fromEntries(new FormData(formProd));
+            datos.precio = Number(datos.precio);
+            datos.stock  = Number(datos.stock);
+            const lista = cargarStore();
+            if (datos.id) {
+                const i = lista.findIndex(p => p.id === Number(datos.id));
+                if (i >= 0) lista[i] = { ...lista[i], ...datos, id: lista[i].id };
+            } else {
+                datos.id = lista.length ? Math.max(...lista.map(p => p.id)) + 1 : 1;
+                lista.push(datos);
+            }
+            guardarStore(lista);
+            toast('Producto guardado', 'ok');
+            cerrarModal('modalProd');
+            render();
+        });
+
+        document.getElementById('filtroCat').addEventListener('change', render);
+        filtrarTabla('buscar', 'tablaProductos');
+        migrarImagenes();
+        render();
+    </script>
+</body>
+</html>

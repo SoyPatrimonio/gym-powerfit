@@ -1,0 +1,29 @@
+# Dependencias
+node_modules/
+vendor/
+
+# Configuración local / credenciales
+.env
+.env.local
+php/config.local.php
+
+# Logs
+*.log
+logs/
+
+# Sistema operativo
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*~
+
+# Respaldos de base de datos
+*.bak
+*.mdf
+*.ldf

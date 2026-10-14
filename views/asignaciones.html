@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asignaciones - PowerFit Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <a href="dashboard.html" class="logo">
+                <i class="fa-solid fa-dumbbell"></i><span>Power<strong>Fit</strong></span>
+            </a>
+            <nav>
+                <a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+                <a href="clientes.html"><i class="fa-solid fa-users"></i> Clientes</a>
+                <a href="personal.html"><i class="fa-solid fa-user-tie"></i> Personal</a>
+                <a href="membresias.html"><i class="fa-solid fa-id-card"></i> Membresías</a>
+                <a href="pagos.html"><i class="fa-solid fa-credit-card"></i> Pagos</a>
+                <a href="productos.html"><i class="fa-solid fa-bottle-water"></i> Productos</a>
+                <a href="reservas.html"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+                <a href="rutinas.html"><i class="fa-solid fa-clipboard-list"></i> Rutinas</a>
+                <a href="planes-nutricionales.html"><i class="fa-solid fa-apple-whole"></i> Nutrición</a>
+                <a href="asignaciones.html" class="activo"><i class="fa-solid fa-link"></i> Asignaciones</a>
+                <a href="mediciones.html"><i class="fa-solid fa-weight-scale"></i> Mediciones</a>
+                <a href="asistencias.html"><i class="fa-solid fa-door-open"></i> Asistencias</a>
+                <a href="reportes.html"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+                <a href="#" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Asignaciones</h1>
+                <div style="display:flex;gap:0.6rem">
+                    <button class="theme-toggle" title="Cambiar tema"><i class="fa-solid fa-sun"></i></button>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab activo" data-tab="rutinas"><i class="fa-solid fa-clipboard-list"></i> Rutinas asignadas</button>
+                <button class="tab" data-tab="nutricion"><i class="fa-solid fa-apple-whole"></i> Planes nutricionales</button>
+            </div>
+
+            <!-- TAB: Rutinas -->
+            <div class="tab-panel activo" id="panel-rutinas">
+                <div class="topbar-sec">
+                    <h2>Rutinas asignadas a clientes</h2>
+                    <button class="btn btn-primary" onclick="abrirAsignarRutina()">
+                        <i class="fa-solid fa-plus"></i> Asignar rutina
+                    </button>
+                </div>
+
+                <div class="tabla-wrap">
+                    <div class="tabla-tools">
+                        <input type="text" id="buscarRut" placeholder="Buscar por cliente o rutina...">
+                    </div>
+                    <table class="data" id="tablaRutinasAsig">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Rutina</th>
+                                <th>Entrenador</th>
+                                <th>Inicio</th>
+                                <th>Fin</th>
+                                <th>Estado</th>
+                                <th>Notas</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB: Nutrición -->
+            <div class="tab-panel" id="panel-nutricion">
+                <div class="topbar-sec">
+                    <h2>Planes nutricionales asignados</h2>
+                    <button class="btn btn-primary" onclick="abrirAsignarPlan()">
+                        <i class="fa-solid fa-plus"></i> Asignar plan
+                    </button>
+                </div>
+
+                <div class="tabla-wrap">
+                    <div class="tabla-tools">
+                        <input type="text" id="buscarNut" placeholder="Buscar por cliente o plan...">
+                    </div>
+                    <table class="data" id="tablaPlanesAsig">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Plan</th>
+                                <th>Nutricionista</th>
+                                <th>Inicio</th>
+                                <th>Estado</th>
+                                <th>Notas</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL Rutina -->
+    <div class="modal-bg" id="modalRut">
+        <div class="modal">
+            <button class="modal-close" onclick="cerrarModal('modalRut')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 id="modalTitRut">Asignar rutina</h3>
+            <form class="form" id="formRut">
+                <input type="hidden" name="id" />
+                <label>Cliente
+                    <select name="cliente_id" id="selCliRut" required></select>
+                </label>
+                <label>Rutina
+                    <select name="rutina_id" id="selRut" required></select>
+                </label>
+                <label>Entrenador
+                    <select name="entrenador_id" id="selEntRut" required></select>
+                </label>
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Fecha inicio <input type="date" name="fecha_inicio" required></label>
+                    <label>Fecha fin <input type="date" name="fecha_fin"></label>
+                </div>
+                <label>Estado
+                    <select name="estado">
+                        <option value="activa">Activa</option>
+                        <option value="pausada">Pausada</option>
+                        <option value="completada">Completada</option>
+                    </select>
+                </label>
+                <label>Notas del entrenador
+                    <textarea name="notas" rows="3" placeholder="Observaciones, ajustes, progresión..."></textarea>
+                </label>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <small class="msg" id="msgRut"></small>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL Plan nutricional -->
+    <div class="modal-bg" id="modalPlanA">
+        <div class="modal">
+            <button class="modal-close" onclick="cerrarModal('modalPlanA')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 id="modalTitPlan">Asignar plan nutricional</h3>
+            <form class="form" id="formPlanA">
+                <input type="hidden" name="id" />
+                <label>Cliente
+                    <select name="cliente_id" id="selCliPlan" required></select>
+                </label>
+                <label>Plan nutricional
+                    <select name="plan_id" id="selPlan" required></select>
+                </label>
+                <label>Nutricionista
+                    <select name="nutricionista_id" id="selNut" required></select>
+                </label>
+                <label>Fecha inicio <input type="date" name="fecha_inicio" required></label>
+                <label>Estado
+                    <select name="estado">
+                        <option value="activo">Activo</option>
+                        <option value="pausado">Pausado</option>
+                        <option value="finalizado">Finalizado</option>
+                    </select>
+                </label>
+                <label>Notas del nutricionista
+                    <textarea name="notas" rows="3" placeholder="Observaciones, ajustes, recomendaciones..."></textarea>
+                </label>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <small class="msg" id="msgPlanA"></small>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        // Datos relacionados (vienen de los demás localStorage stores)
+        const getClientes = () => JSON.parse(localStorage.getItem('powerfit_clientes') || '[]');
+        const getRutinas  = () => JSON.parse(localStorage.getItem('powerfit_rutinas')  || '[]');
+        const getPlanes   = () => JSON.parse(localStorage.getItem('powerfit_planes_nutri') || '[]');
+        const getPersonal = () => JSON.parse(localStorage.getItem('powerfit_personal') || '[]');
+
+        // Stores propios
+        const storeRut  = demoStore('powerfit_rutinas_asig', []);
+        const storePlan = demoStore('powerfit_planes_asig', []);
+
+        // Helpers
+        const nombreCliente = (id) => {
+            const c = getClientes().find(x => Number(x.id_cliente) === Number(id));
+            return c ? `${c.nombre} ${c.apellido}` : 'Cliente #' + id;
+        };
+        const nombreRutina = (id) => {
+            const r = getRutinas().find(x => Number(x.id_rutina) === Number(id));
+            return r ? r.nombre : 'Rutina #' + id;
+        };
+        const nombrePlan = (id) => {
+            const p = getPlanes().find(x => Number(x.id) === Number(id));
+            return p ? p.nombre : 'Plan #' + id;
+        };
+        const nombrePersonal = (id) => {
+            const p = getPersonal().find(x => Number(x.id) === Number(id));
+            return p ? p.nombre : '—';
+        };
+
+        // ========== TABS ==========
+        document.querySelectorAll('.tab').forEach(t => {
+            t.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(x => x.classList.remove('activo'));
+                document.querySelectorAll('.tab-panel').forEach(x => x.classList.remove('activo'));
+                t.classList.add('activo');
+                document.getElementById('panel-' + t.dataset.tab).classList.add('activo');
+            });
+        });
+
+        // ========== RUTINAS ASIGNADAS ==========
+        function renderRutAsig() {
+            const lista = storeRut.all();
+            const tbody = document.querySelector('#tablaRutinasAsig tbody');
+            tbody.innerHTML = lista.map(a => `
+                <tr>
+                    <td>${a.id}</td>
+                    <td><strong>${nombreCliente(a.cliente_id)}</strong></td>
+                    <td>${nombreRutina(a.rutina_id)}</td>
+                    <td><i class="fa-solid fa-user-tie"></i> ${nombrePersonal(a.entrenador_id)}</td>
+                    <td>${formatoFecha(a.fecha_inicio)}</td>
+                    <td>${a.fecha_fin ? formatoFecha(a.fecha_fin) : '-'}</td>
+                    <td><span class="badge-estado ${a.estado === 'activa' ? 'activo' : 'inactivo'}">${a.estado}</span></td>
+                    <td>${(a.notas || '').substring(0, 40)}${(a.notas||'').length > 40 ? '…' : ''}</td>
+                    <td class="acciones">
+                        <button onclick="editarRut(${a.id})" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-del" onclick="eliminarRut(${a.id})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="9" style="text-align:center;color:#888">Sin asignaciones</td></tr>';
+        }
+
+        function llenarSelectsRut() {
+            document.getElementById('selCliRut').innerHTML = '<option value="">-- Cliente --</option>' +
+                getClientes().map(c => `<option value="${c.id_cliente}">${c.nombre} ${c.apellido}</option>`).join('');
+            document.getElementById('selRut').innerHTML = '<option value="">-- Rutina --</option>' +
+                getRutinas().map(r => `<option value="${r.id_rutina}">${r.nombre} (${r.nivel})</option>`).join('');
+            document.getElementById('selEntRut').innerHTML = '<option value="">-- Entrenador --</option>' +
+                getPersonal().filter(p => p.tipo === 'entrenador' && p.estado === 'activo')
+                             .map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+        }
+
+        function abrirAsignarRutina() {
+            const formRut = document.getElementById('formRut');
+            formRut.reset();
+            formRut.id.value = '';
+            llenarSelectsRut();
+            // Pre-seleccionar entrenador del cliente si tiene
+            document.getElementById('selCliRut').addEventListener('change', preseleccionarEntrenador, { once: true });
+            formRut.fecha_inicio.value = new Date().toISOString().substring(0, 10);
+            document.getElementById('modalTitRut').textContent = 'Asignar rutina';
+            abrirModal('modalRut');
+        }
+        function preseleccionarEntrenador(e) {
+            const id = e.target.value;
+            const c = getClientes().find(x => String(x.id_cliente) === String(id));
+            if (c && c.entrenador_id) {
+                document.getElementById('selEntRut').value = c.entrenador_id;
+            }
+        }
+
+        function editarRut(id) {
+            const a = storeRut.all().find(x => x.id === id);
+            if (!a) return;
+            llenarSelectsRut();
+            const formRut = document.getElementById('formRut');
+            formRut.id.value             = a.id;
+            formRut.cliente_id.value     = a.cliente_id;
+            formRut.rutina_id.value      = a.rutina_id;
+            formRut.entrenador_id.value  = a.entrenador_id;
+            formRut.fecha_inicio.value   = a.fecha_inicio;
+            formRut.fecha_fin.value      = a.fecha_fin || '';
+            formRut.estado.value         = a.estado;
+            formRut.notas.value          = a.notas || '';
+            document.getElementById('modalTitRut').textContent = 'Editar asignación';
+            abrirModal('modalRut');
+        }
+
+        function eliminarRut(id) {
+            if (!confirm('¿Eliminar esta asignación?')) return;
+            storeRut.save(storeRut.all().filter(a => a.id !== id));
+            toast('Asignación eliminada', 'ok');
+            renderRutAsig();
+        }
+
+        document.getElementById('formRut').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const datos = Object.fromEntries(new FormData(e.target));
+            ['cliente_id','rutina_id','entrenador_id'].forEach(k => datos[k] = Number(datos[k]));
+            const lista = storeRut.all();
+            if (datos.id) {
+                const i = lista.findIndex(a => a.id === Number(datos.id));
+                if (i >= 0) lista[i] = { ...lista[i], ...datos, id: lista[i].id };
+            } else {
+                datos.id = storeRut.nextId('id');
+                lista.push(datos);
+            }
+            storeRut.save(lista);
+            toast('Rutina asignada', 'ok');
+            cerrarModal('modalRut');
+            renderRutAsig();
+        });
+
+        // ========== PLANES NUTRICIONALES ASIGNADOS ==========
+        function renderPlanAsig() {
+            const lista = storePlan.all();
+            const tbody = document.querySelector('#tablaPlanesAsig tbody');
+            tbody.innerHTML = lista.map(a => `
+                <tr>
+                    <td>${a.id}</td>
+                    <td><strong>${nombreCliente(a.cliente_id)}</strong></td>
+                    <td>${nombrePlan(a.plan_id)}</td>
+                    <td><i class="fa-solid fa-apple-whole"></i> ${nombrePersonal(a.nutricionista_id)}</td>
+                    <td>${formatoFecha(a.fecha_inicio)}</td>
+                    <td><span class="badge-estado ${a.estado === 'activo' ? 'activo' : 'inactivo'}">${a.estado}</span></td>
+                    <td>${(a.notas || '').substring(0, 40)}${(a.notas||'').length > 40 ? '…' : ''}</td>
+                    <td class="acciones">
+                        <button onclick="editarPlan(${a.id})" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-del" onclick="eliminarPlan(${a.id})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="8" style="text-align:center;color:#888">Sin asignaciones</td></tr>';
+        }
+
+        function llenarSelectsPlan() {
+            document.getElementById('selCliPlan').innerHTML = '<option value="">-- Cliente --</option>' +
+                getClientes().map(c => `<option value="${c.id_cliente}">${c.nombre} ${c.apellido}</option>`).join('');
+            document.getElementById('selPlan').innerHTML = '<option value="">-- Plan --</option>' +
+                getPlanes().map(p => `<option value="${p.id}">${p.nombre} (${p.objetivo})</option>`).join('');
+            document.getElementById('selNut').innerHTML = '<option value="">-- Nutricionista --</option>' +
+                getPersonal().filter(p => p.tipo === 'nutricionista' && p.estado === 'activo')
+                             .map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+        }
+
+        function abrirAsignarPlan() {
+            const formPlanA = document.getElementById('formPlanA');
+            formPlanA.reset();
+            formPlanA.id.value = '';
+            llenarSelectsPlan();
+            document.getElementById('selCliPlan').addEventListener('change', preseleccionarNutri, { once: true });
+            formPlanA.fecha_inicio.value = new Date().toISOString().substring(0, 10);
+            document.getElementById('modalTitPlan').textContent = 'Asignar plan nutricional';
+            abrirModal('modalPlanA');
+        }
+        function preseleccionarNutri(e) {
+            const c = getClientes().find(x => String(x.id_cliente) === String(e.target.value));
+            if (c && c.nutricionista_id) document.getElementById('selNut').value = c.nutricionista_id;
+        }
+
+        function editarPlan(id) {
+            const a = storePlan.all().find(x => x.id === id);
+            if (!a) return;
+            llenarSelectsPlan();
+            const formPlanA = document.getElementById('formPlanA');
+            formPlanA.id.value                = a.id;
+            formPlanA.cliente_id.value        = a.cliente_id;
+            formPlanA.plan_id.value           = a.plan_id;
+            formPlanA.nutricionista_id.value  = a.nutricionista_id;
+            formPlanA.fecha_inicio.value      = a.fecha_inicio;
+            formPlanA.estado.value            = a.estado;
+            formPlanA.notas.value             = a.notas || '';
+            document.getElementById('modalTitPlan').textContent = 'Editar asignación';
+            abrirModal('modalPlanA');
+        }
+
+        function eliminarPlan(id) {
+            if (!confirm('¿Eliminar esta asignación?')) return;
+            storePlan.save(storePlan.all().filter(a => a.id !== id));
+            toast('Asignación eliminada', 'ok');
+            renderPlanAsig();
+        }
+
+        document.getElementById('formPlanA').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const datos = Object.fromEntries(new FormData(e.target));
+            ['cliente_id','plan_id','nutricionista_id'].forEach(k => datos[k] = Number(datos[k]));
+            const lista = storePlan.all();
+            if (datos.id) {
+                const i = lista.findIndex(a => a.id === Number(datos.id));
+                if (i >= 0) lista[i] = { ...lista[i], ...datos, id: lista[i].id };
+            } else {
+                datos.id = storePlan.nextId('id');
+                lista.push(datos);
+            }
+            storePlan.save(lista);
+            toast('Plan asignado', 'ok');
+            cerrarModal('modalPlanA');
+            renderPlanAsig();
+        });
+
+        filtrarTabla('buscarRut', 'tablaRutinasAsig');
+        filtrarTabla('buscarNut', 'tablaPlanesAsig');
+        renderRutAsig();
+        renderPlanAsig();
+    </script>
+</body>
+</html>

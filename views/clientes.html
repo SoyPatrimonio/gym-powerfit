@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clientes - PowerFit Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <a href="dashboard.html" class="logo">
+                <i class="fa-solid fa-dumbbell"></i><span>Power<strong>Fit</strong></span>
+            </a>
+            <nav>
+                <a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+                <a href="clientes.html" class="activo"><i class="fa-solid fa-users"></i> Clientes</a>
+                <a href="personal.html"><i class="fa-solid fa-user-tie"></i> Personal</a>
+                <a href="membresias.html"><i class="fa-solid fa-id-card"></i> Membresías</a>
+                <a href="pagos.html"><i class="fa-solid fa-credit-card"></i> Pagos</a>
+                <a href="productos.html"><i class="fa-solid fa-bottle-water"></i> Productos</a>
+                <a href="reservas.html"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+                <a href="rutinas.html"><i class="fa-solid fa-clipboard-list"></i> Rutinas</a>
+                <a href="planes-nutricionales.html"><i class="fa-solid fa-apple-whole"></i> Nutrición</a>
+                <a href="asignaciones.html"><i class="fa-solid fa-link"></i> Asignaciones</a>
+                <a href="mediciones.html"><i class="fa-solid fa-weight-scale"></i> Mediciones</a>
+                <a href="asistencias.html"><i class="fa-solid fa-door-open"></i> Asistencias</a>
+                <a href="reportes.html"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+                <a href="#" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Gestión de Clientes</h1>
+                <div style="display:flex;gap:0.6rem">
+                    <button class="theme-toggle" title="Cambiar tema"><i class="fa-solid fa-sun"></i></button>
+                    <button class="btn btn-ghost" onclick="exportarCSV('tablaClientes','clientes.csv')">
+                        <i class="fa-solid fa-file-csv"></i> Exportar CSV
+                    </button>
+                    <button class="btn btn-primary" onclick="abrirNuevo()">
+                        <i class="fa-solid fa-plus"></i> Nuevo cliente
+                    </button>
+                </div>
+            </div>
+
+            <div class="tabla-wrap">
+                <div class="tabla-tools">
+                    <input type="text" id="buscar" placeholder="Buscar por nombre, documento, email...">
+                    <select id="filtroGenero" class="select-inline">
+                        <option value="">Todos los géneros</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                        <option value="O">Otro</option>
+                    </select>
+                </div>
+                <table class="data" id="tablaClientes">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Documento</th>
+                            <th>Teléfono</th>
+                            <th>Entrenador</th>
+                            <th>Nutricionista</th>
+                            <th>F. Registro</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL CRUD -->
+    <div class="modal-bg" id="modalCliente">
+        <div class="modal">
+            <button class="modal-close" onclick="cerrarModal('modalCliente')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 id="modalTitulo">Nuevo cliente</h3>
+            <form class="form" id="formCliente">
+                <input type="hidden" name="id_cliente" />
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Nombre <input type="text" name="nombre" required></label>
+                    <label>Apellido <input type="text" name="apellido" required></label>
+                </div>
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Documento <input type="text" name="documento" required></label>
+                    <label>Teléfono <input type="text" name="telefono"></label>
+                </div>
+                <label>Email <input type="email" name="email"></label>
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Fecha nacimiento <input type="date" name="fecha_nacimiento"></label>
+                    <label>Género
+                        <select name="genero">
+                            <option value="">--</option>
+                            <option value="M">Masculino</option>
+                            <option value="F">Femenino</option>
+                            <option value="O">Otro</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Entrenador asignado
+                        <select name="entrenador_id" id="selEntrenador">
+                            <option value="">-- Sin asignar --</option>
+                        </select>
+                    </label>
+                    <label>Nutricionista asignado
+                        <select name="nutricionista_id" id="selNutricionista">
+                            <option value="">-- Sin asignar --</option>
+                        </select>
+                    </label>
+                </div>
+                <label>Objetivo principal
+                    <select name="objetivo">
+                        <option value="">--</option>
+                        <option>Perder grasa</option>
+                        <option>Ganar masa muscular</option>
+                        <option>Tonificar</option>
+                        <option>Mantener</option>
+                        <option>Fuerza</option>
+                        <option>Rehabilitación</option>
+                    </select>
+                </label>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <small class="msg" id="msgCliente"></small>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        const tbody = document.querySelector('#tablaClientes tbody');
+        const formCli = document.getElementById('formCliente');
+
+        const DEMO_CLIENTES = [
+            { id_cliente:1, nombre:'Juan Carlos', apellido:'Pérez Gómez',   documento:'1020304050', telefono:'3201234567', email:'juan@mail.com',   fecha_nacimiento:'1995-06-12', genero:'M', fecha_registro:'2026-01-10' },
+            { id_cliente:2, nombre:'María José',  apellido:'López Mendoza', documento:'1030405060', telefono:'3112345678', email:'maria@mail.com',  fecha_nacimiento:'1998-11-23', genero:'F', fecha_registro:'2026-02-05' },
+            { id_cliente:3, nombre:'Luis Andrés', apellido:'Castro Silva',  documento:'1040506070', telefono:'3013456789', email:'luis@mail.com',   fecha_nacimiento:'1990-03-15', genero:'M', fecha_registro:'2026-02-20' },
+            { id_cliente:4, nombre:'Ana Lucía',   apellido:'Vargas Ríos',   documento:'1050607080', telefono:'3204567890', email:'ana@mail.com',    fecha_nacimiento:'2000-07-30', genero:'F', fecha_registro:'2026-03-01' },
+            { id_cliente:5, nombre:'Pedro',       apellido:'Salazar Mora',  documento:'1060708090', telefono:'3155678901', email:'pedro@mail.com',  fecha_nacimiento:'1985-09-09', genero:'M', fecha_registro:'2026-03-15' }
+        ];
+        const store = demoStore('powerfit_clientes', DEMO_CLIENTES);
+        let MODO_DEMO = false;
+
+        // Personal disponible (para mostrar nombres y rellenar selects)
+        const getPersonal = () => JSON.parse(localStorage.getItem('powerfit_personal') || '[]');
+        const nombrePersonal = (id) => {
+            if (!id) return '<span style="color:var(--text-300)">Sin asignar</span>';
+            const p = getPersonal().find(x => Number(x.id) === Number(id));
+            return p ? p.nombre : '—';
+        };
+
+        function llenarSelectsPersonal() {
+            const personal = getPersonal();
+            const ents = personal.filter(p => p.tipo === 'entrenador' && p.estado === 'activo');
+            const nuts = personal.filter(p => p.tipo === 'nutricionista' && p.estado === 'activo');
+            document.getElementById('selEntrenador').innerHTML   = '<option value="">-- Sin asignar --</option>' +
+                ents.map(p => `<option value="${p.id}">${p.nombre} (${p.especialidad || ''})</option>`).join('');
+            document.getElementById('selNutricionista').innerHTML = '<option value="">-- Sin asignar --</option>' +
+                nuts.map(p => `<option value="${p.id}">${p.nombre} (${p.especialidad || ''})</option>`).join('');
+        }
+
+        function render(lista) {
+            tbody.innerHTML = lista.map(c => `
+                <tr>
+                    <td>${c.id_cliente}</td>
+                    <td>${c.nombre}</td>
+                    <td>${c.apellido}</td>
+                    <td>${c.documento}</td>
+                    <td>${c.telefono || '-'}</td>
+                    <td><i class="fa-solid fa-dumbbell" style="color:var(--primary);font-size:0.8rem"></i> ${nombrePersonal(c.entrenador_id)}</td>
+                    <td><i class="fa-solid fa-apple-whole" style="color:var(--success);font-size:0.8rem"></i> ${nombrePersonal(c.nutricionista_id)}</td>
+                    <td>${c.fecha_registro ? formatoFecha(c.fecha_registro) : '-'}</td>
+                    <td class="acciones">
+                        <button onclick="editar(${c.id_cliente})" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-del" onclick="eliminar(${c.id_cliente})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="9" style="text-align:center;color:#888">Sin registros</td></tr>';
+        }
+
+        async function cargar() {
+            const r = await api('../php/clientes.php?accion=listar');
+            if (r.ok && Array.isArray(r.datos)) {
+                MODO_DEMO = false;
+                render(r.datos);
+                return;
+            }
+            // Fallback demo
+            MODO_DEMO = true;
+            render(store.all());
+        }
+
+        function abrirNuevo() {
+            formCli.reset();
+            formCli.id_cliente.value = '';
+            llenarSelectsPersonal();
+            document.getElementById('modalTitulo').textContent = 'Nuevo cliente';
+            abrirModal('modalCliente');
+        }
+
+        async function editar(id) {
+            llenarSelectsPersonal();
+            if (MODO_DEMO) {
+                const c = store.all().find(x => x.id_cliente === id);
+                if (!c) return;
+                formCli.id_cliente.value         = c.id_cliente;
+                formCli.nombre.value             = c.nombre;
+                formCli.apellido.value           = c.apellido;
+                formCli.documento.value          = c.documento;
+                formCli.telefono.value           = c.telefono || '';
+                formCli.email.value              = c.email || '';
+                formCli.fecha_nacimiento.value   = c.fecha_nacimiento || '';
+                formCli.genero.value             = c.genero || '';
+                formCli.entrenador_id.value      = c.entrenador_id || '';
+                formCli.nutricionista_id.value   = c.nutricionista_id || '';
+                if (formCli.objetivo) formCli.objetivo.value = c.objetivo || '';
+                document.getElementById('modalTitulo').textContent = 'Editar cliente';
+                abrirModal('modalCliente');
+                return;
+            }
+            const r = await api('../php/clientes.php?accion=obtener&id=' + id);
+            if (!r.ok) return toast(r.mensaje, 'error');
+            const c = r.datos;
+            formCli.id_cliente.value       = c.id_cliente;
+            formCli.nombre.value           = c.nombre;
+            formCli.apellido.value         = c.apellido;
+            formCli.documento.value        = c.documento;
+            formCli.telefono.value         = c.telefono || '';
+            formCli.email.value            = c.email || '';
+            formCli.fecha_nacimiento.value = c.fecha_nacimiento ? String(c.fecha_nacimiento).substring(0,10) : '';
+            formCli.genero.value           = (c.genero || '').trim();
+            document.getElementById('modalTitulo').textContent = 'Editar cliente';
+            abrirModal('modalCliente');
+        }
+
+        async function eliminar(id) {
+            if (!confirm('¿Eliminar este cliente? Esta acción no se puede deshacer.')) return;
+            if (MODO_DEMO) {
+                const lista = store.all().filter(c => c.id_cliente !== id);
+                store.save(lista);
+                toast('Cliente eliminado', 'ok');
+                render(lista);
+                return;
+            }
+            const r = await api('../php/clientes.php?accion=eliminar', { id_cliente: id });
+            toast(r.mensaje, r.ok ? 'ok' : 'error');
+            if (r.ok) cargar();
+        }
+
+        formCli.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msg = document.getElementById('msgCliente');
+            const datos = Object.fromEntries(new FormData(formCli));
+
+            if (MODO_DEMO) {
+                const lista = store.all();
+                if (datos.id_cliente) {
+                    const i = lista.findIndex(c => c.id_cliente === Number(datos.id_cliente));
+                    if (i >= 0) lista[i] = { ...lista[i], ...datos, id_cliente: lista[i].id_cliente };
+                } else {
+                    datos.id_cliente = store.nextId('id_cliente');
+                    datos.fecha_registro = new Date().toISOString().substring(0, 10);
+                    lista.push(datos);
+                }
+                store.save(lista);
+                msg.textContent = 'Cliente guardado';
+                msg.className = 'msg ok';
+                setTimeout(() => { cerrarModal('modalCliente'); render(store.all()); }, 500);
+                return;
+            }
+
+            const accion = datos.id_cliente ? 'actualizar' : 'crear';
+            const r = await api('../php/clientes.php?accion=' + accion, datos);
+            msg.textContent = r.mensaje;
+            msg.className = 'msg ' + (r.ok ? 'ok' : 'error');
+            if (r.ok) {
+                setTimeout(() => { cerrarModal('modalCliente'); cargar(); }, 600);
+            }
+        });
+
+        // Filtro por género
+        document.getElementById('filtroGenero')?.addEventListener('change', (e) => {
+            const g = e.target.value;
+            const lista = (MODO_DEMO ? store.all() : []).filter(c => !g || c.genero === g);
+            render(MODO_DEMO ? lista : store.all());
+        });
+
+        filtrarTabla('buscar', 'tablaClientes');
+        cargar();
+    </script>
+</body>
+</html>

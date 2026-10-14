@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mediciones - PowerFit Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <a href="dashboard.html" class="logo">
+                <i class="fa-solid fa-dumbbell"></i><span>Power<strong>Fit</strong></span>
+            </a>
+            <nav>
+                <a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+                <a href="clientes.html"><i class="fa-solid fa-users"></i> Clientes</a>
+                <a href="personal.html"><i class="fa-solid fa-user-tie"></i> Personal</a>
+                <a href="membresias.html"><i class="fa-solid fa-id-card"></i> Membresías</a>
+                <a href="pagos.html"><i class="fa-solid fa-credit-card"></i> Pagos</a>
+                <a href="productos.html"><i class="fa-solid fa-bottle-water"></i> Productos</a>
+                <a href="reservas.html"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+                <a href="rutinas.html"><i class="fa-solid fa-clipboard-list"></i> Rutinas</a>
+                <a href="planes-nutricionales.html"><i class="fa-solid fa-apple-whole"></i> Nutrición</a>
+                <a href="asignaciones.html"><i class="fa-solid fa-link"></i> Asignaciones</a>
+                <a href="mediciones.html" class="activo"><i class="fa-solid fa-weight-scale"></i> Mediciones</a>
+                <a href="asistencias.html"><i class="fa-solid fa-door-open"></i> Asistencias</a>
+                <a href="reportes.html"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+                <a href="#" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Mediciones y Progreso</h1>
+                <div style="display:flex;gap:0.6rem">
+                    <button class="theme-toggle" title="Cambiar tema"><i class="fa-solid fa-sun"></i></button>
+                    <button class="btn btn-ghost" onclick="exportarCSV('tablaMed','mediciones.csv')">
+                        <i class="fa-solid fa-file-csv"></i> Exportar
+                    </button>
+                    <button class="btn btn-primary" onclick="abrirNuevo()">
+                        <i class="fa-solid fa-plus"></i> Nueva medición
+                    </button>
+                </div>
+            </div>
+
+            <!-- Selector de cliente + KPIs y gráfico -->
+            <div class="card" style="margin-bottom:1.5rem">
+                <label style="margin-bottom:1rem;display:block">
+                    Seleccionar cliente para ver progreso:
+                    <select id="selClienteVer" class="select-inline" style="margin-top:0.4rem;width:100%;max-width:400px"></select>
+                </label>
+
+                <div id="kpisProgreso" class="kpi-grid" style="margin-bottom:1rem"></div>
+
+                <canvas id="chartProgreso" height="100"></canvas>
+            </div>
+
+            <div class="tabla-wrap">
+                <div class="tabla-tools">
+                    <input type="text" id="buscar" placeholder="Buscar por cliente...">
+                </div>
+                <table class="data" id="tablaMed">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Peso (kg)</th>
+                            <th>IMC</th>
+                            <th>% Grasa</th>
+                            <th>Cintura</th>
+                            <th>Brazo</th>
+                            <th>Pierna</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-bg" id="modalMed">
+        <div class="modal">
+            <button class="modal-close" onclick="cerrarModal('modalMed')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 id="modalTitulo">Nueva medición</h3>
+            <form class="form" id="formMed">
+                <input type="hidden" name="id" />
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Cliente
+                        <select name="cliente_id" id="selCliente" required></select>
+                    </label>
+                    <label>Fecha <input type="date" name="fecha" required></label>
+                </div>
+                <div class="grid grid-3" style="gap:1rem">
+                    <label>Peso (kg) <input type="number" name="peso" step="0.1" min="20" max="300" required></label>
+                    <label>Altura (cm) <input type="number" name="altura" min="100" max="230"></label>
+                    <label>% Grasa <input type="number" name="grasa" step="0.1" min="0" max="60"></label>
+                </div>
+                <div class="grid grid-3" style="gap:1rem">
+                    <label>Cintura (cm) <input type="number" name="cintura" step="0.1"></label>
+                    <label>Brazo (cm) <input type="number" name="brazo" step="0.1"></label>
+                    <label>Pierna (cm) <input type="number" name="pierna" step="0.1"></label>
+                </div>
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Pecho (cm) <input type="number" name="pecho" step="0.1"></label>
+                    <label>Cadera (cm) <input type="number" name="cadera" step="0.1"></label>
+                </div>
+                <label>Observaciones <textarea name="notas" rows="2"></textarea></label>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <small class="msg" id="msgMed"></small>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="../js/script.js"></script>
+    <script>
+        const hoy = new Date();
+        const fHoy = hoy.toISOString().substring(0, 10);
+        const fHaceMeses = (n) => { const d = new Date(); d.setMonth(d.getMonth() - n); return d.toISOString().substring(0,10); };
+
+        const DEMO = [
+            { id:1, cliente_id:1, fecha:fHaceMeses(4), peso:82.0, altura:175, grasa:22.5, cintura:92, brazo:34, pierna:58, pecho:100, cadera:98, notas:'Inicio del proceso' },
+            { id:2, cliente_id:1, fecha:fHaceMeses(3), peso:80.5, altura:175, grasa:21.2, cintura:90, brazo:34.5, pierna:58, pecho:99, cadera:97, notas:'' },
+            { id:3, cliente_id:1, fecha:fHaceMeses(2), peso:78.8, altura:175, grasa:19.5, cintura:87, brazo:35, pierna:58.5, pecho:100, cadera:96, notas:'Buen progreso' },
+            { id:4, cliente_id:1, fecha:fHaceMeses(1), peso:77.3, altura:175, grasa:17.8, cintura:85, brazo:35.5, pierna:59, pecho:101, cadera:95, notas:'' },
+            { id:5, cliente_id:1, fecha:fHoy,         peso:75.8, altura:175, grasa:16.0, cintura:83, brazo:36, pierna:60, pecho:102, cadera:94, notas:'Objetivo alcanzado' },
+            { id:6, cliente_id:2, fecha:fHaceMeses(3), peso:62.0, altura:165, grasa:28.0, cintura:78, brazo:28, pierna:54, pecho:90,  cadera:96, notas:'' },
+            { id:7, cliente_id:2, fecha:fHaceMeses(1), peso:60.5, altura:165, grasa:25.5, cintura:75, brazo:28.5, pierna:55, pecho:90, cadera:94, notas:'' },
+            { id:8, cliente_id:2, fecha:fHoy,         peso:59.0, altura:165, grasa:23.0, cintura:72, brazo:29, pierna:55.5, pecho:90, cadera:93, notas:'' }
+        ];
+        const store = demoStore('powerfit_mediciones', DEMO);
+        const tbody = document.querySelector('#tablaMed tbody');
+        const formMed = document.getElementById('formMed');
+        let chartProg = null;
+
+        const getClientes = () => JSON.parse(localStorage.getItem('powerfit_clientes') || '[]');
+
+        function nombreCliente(id) {
+            const c = getClientes().find(x => Number(x.id_cliente) === Number(id));
+            return c ? `${c.nombre} ${c.apellido}` : 'Cliente #' + id;
+        }
+
+        function calcIMC(peso, altura) {
+            if (!peso || !altura) return null;
+            const m = altura / 100;
+            return peso / (m * m);
+        }
+
+        function llenarSelectsClientes() {
+            const clientes = getClientes();
+            const html = clientes.map(c => `<option value="${c.id_cliente}">${c.nombre} ${c.apellido}</option>`).join('');
+            document.getElementById('selCliente').innerHTML = '<option value="">-- Selecciona --</option>' + html;
+            const ver = document.getElementById('selClienteVer');
+            ver.innerHTML = '<option value="">-- Selecciona un cliente --</option>' + html;
+        }
+
+        function render() {
+            const lista = store.all().slice().sort((a,b) => b.fecha.localeCompare(a.fecha));
+            tbody.innerHTML = lista.map(m => {
+                const imc = calcIMC(m.peso, m.altura);
+                return `
+                <tr>
+                    <td>${m.id}</td>
+                    <td><strong>${nombreCliente(m.cliente_id)}</strong></td>
+                    <td>${formatoFecha(m.fecha)}</td>
+                    <td><strong>${m.peso}</strong></td>
+                    <td>${imc ? imc.toFixed(1) : '-'}</td>
+                    <td>${m.grasa ? m.grasa + '%' : '-'}</td>
+                    <td>${m.cintura ? m.cintura + ' cm' : '-'}</td>
+                    <td>${m.brazo ? m.brazo + ' cm' : '-'}</td>
+                    <td>${m.pierna ? m.pierna + ' cm' : '-'}</td>
+                    <td class="acciones">
+                        <button onclick="editar(${m.id})" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-del" onclick="eliminar(${m.id})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            }).join('') || '<tr><td colspan="10" style="text-align:center;color:#888">Sin mediciones</td></tr>';
+        }
+
+        function renderProgreso() {
+            const id = document.getElementById('selClienteVer').value;
+            const kpis = document.getElementById('kpisProgreso');
+            const ctx = document.getElementById('chartProgreso');
+            if (!id) {
+                kpis.innerHTML = '<div style="color:var(--text-300);padding:1rem">Selecciona un cliente para ver su progreso</div>';
+                chartProg?.destroy();
+                chartProg = null;
+                return;
+            }
+            const meds = store.all()
+                .filter(m => Number(m.cliente_id) === Number(id))
+                .sort((a,b) => a.fecha.localeCompare(b.fecha));
+            if (!meds.length) {
+                kpis.innerHTML = '<div style="color:var(--text-300);padding:1rem">Este cliente aún no tiene mediciones</div>';
+                chartProg?.destroy();
+                chartProg = null;
+                return;
+            }
+            const primera = meds[0], ultima = meds[meds.length - 1];
+            const dPeso = (ultima.peso - primera.peso);
+            const dGrasa = (ultima.grasa - primera.grasa);
+            const dCintura = (ultima.cintura - primera.cintura);
+            const dBrazo = (ultima.brazo - primera.brazo);
+            const fmtDelta = (v, unidad, inverso) => {
+                if (v == null || isNaN(v)) return '-';
+                const positivo = inverso ? v < 0 : v > 0;
+                const color = positivo ? 'var(--success)' : (v === 0 ? 'var(--text-300)' : 'var(--danger)');
+                const signo = v > 0 ? '+' : '';
+                return `<span style="color:${color}">${signo}${v.toFixed(1)}${unidad}</span>`;
+            };
+            kpis.innerHTML = `
+                <div class="kpi"><h4>Peso actual</h4><div class="valor">${ultima.peso} kg</div><small>${fmtDelta(dPeso, ' kg', true)}</small></div>
+                <div class="kpi info"><h4>IMC actual</h4><div class="valor">${calcIMC(ultima.peso, ultima.altura)?.toFixed(1) || '-'}</div></div>
+                <div class="kpi success"><h4>% Grasa</h4><div class="valor">${ultima.grasa}%</div><small>${fmtDelta(dGrasa, '%', true)}</small></div>
+                <div class="kpi warning"><h4>Cintura</h4><div class="valor">${ultima.cintura} cm</div><small>${fmtDelta(dCintura, ' cm', true)}</small></div>
+                <div class="kpi"><h4>Brazo</h4><div class="valor">${ultima.brazo} cm</div><small>${fmtDelta(dBrazo, ' cm', false)}</small></div>
+                <div class="kpi"><h4>Mediciones</h4><div class="valor">${meds.length}</div><small>en ${Math.round((new Date(ultima.fecha) - new Date(primera.fecha))/86400000)} días</small></div>
+            `;
+
+            chartProg?.destroy();
+            chartProg = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: meds.map(m => formatoFecha(m.fecha)),
+                    datasets: [
+                        { label:'Peso (kg)',  data: meds.map(m => m.peso),    borderColor:'#ff3d2e', backgroundColor:'rgba(255,61,46,0.1)', tension:0.3, yAxisID:'y' },
+                        { label:'% Grasa',    data: meds.map(m => m.grasa),   borderColor:'#ff8a00', backgroundColor:'rgba(255,138,0,0.1)', tension:0.3, yAxisID:'y1' },
+                        { label:'Cintura',    data: meds.map(m => m.cintura), borderColor:'#18c964', backgroundColor:'rgba(24,201,100,0.1)',tension:0.3, hidden:true, yAxisID:'y1' },
+                        { label:'Brazo',      data: meds.map(m => m.brazo),   borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.1)',tension:0.3, hidden:true, yAxisID:'y1' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: {
+                        y:  { type:'linear', position:'left',  title:{ display:true, text:'Peso (kg)' } },
+                        y1: { type:'linear', position:'right', title:{ display:true, text:'% / cm' }, grid:{ drawOnChartArea: false } }
+                    }
+                }
+            });
+        }
+
+        function abrirNuevo() {
+            formMed.reset();
+            formMed.id.value = '';
+            formMed.fecha.value = fHoy;
+            document.getElementById('modalTitulo').textContent = 'Nueva medición';
+            abrirModal('modalMed');
+        }
+
+        function editar(id) {
+            const m = store.all().find(x => x.id === id);
+            if (!m) return;
+            for (const k in m) if (formMed[k] !== undefined) formMed[k].value = m[k] ?? '';
+            document.getElementById('modalTitulo').textContent = 'Editar medición';
+            abrirModal('modalMed');
+        }
+
+        function eliminar(id) {
+            if (!confirm('¿Eliminar esta medición?')) return;
+            store.save(store.all().filter(m => m.id !== id));
+            toast('Medición eliminada', 'ok');
+            render();
+            renderProgreso();
+        }
+
+        formMed.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const datos = Object.fromEntries(new FormData(formMed));
+            ['cliente_id','peso','altura','grasa','cintura','brazo','pierna','pecho','cadera'].forEach(k => {
+                if (datos[k] !== '') datos[k] = Number(datos[k]);
+                else delete datos[k];
+            });
+            const lista = store.all();
+            if (datos.id) {
+                const i = lista.findIndex(m => m.id === Number(datos.id));
+                if (i >= 0) lista[i] = { ...lista[i], ...datos, id: lista[i].id };
+            } else {
+                datos.id = store.nextId('id');
+                lista.push(datos);
+            }
+            store.save(lista);
+            toast('Medición guardada', 'ok');
+            cerrarModal('modalMed');
+            render();
+            renderProgreso();
+        });
+
+        document.getElementById('selClienteVer').addEventListener('change', renderProgreso);
+        filtrarTabla('buscar', 'tablaMed');
+        llenarSelectsClientes();
+        // Pre-seleccionar primer cliente con mediciones
+        const primero = store.all()[0];
+        if (primero) document.getElementById('selClienteVer').value = primero.cliente_id;
+        render();
+        renderProgreso();
+    </script>
+</body>
+</html>

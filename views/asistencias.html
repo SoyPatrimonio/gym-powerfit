@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asistencias - PowerFit Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <a href="dashboard.html" class="logo">
+                <i class="fa-solid fa-dumbbell"></i><span>Power<strong>Fit</strong></span>
+            </a>
+            <nav>
+                <a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+                <a href="clientes.html"><i class="fa-solid fa-users"></i> Clientes</a>
+                <a href="personal.html"><i class="fa-solid fa-user-tie"></i> Personal</a>
+                <a href="membresias.html"><i class="fa-solid fa-id-card"></i> Membresías</a>
+                <a href="pagos.html"><i class="fa-solid fa-credit-card"></i> Pagos</a>
+                <a href="productos.html"><i class="fa-solid fa-bottle-water"></i> Productos</a>
+                <a href="reservas.html"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+                <a href="rutinas.html"><i class="fa-solid fa-clipboard-list"></i> Rutinas</a>
+                <a href="planes-nutricionales.html"><i class="fa-solid fa-apple-whole"></i> Nutrición</a>
+                <a href="asignaciones.html"><i class="fa-solid fa-link"></i> Asignaciones</a>
+                <a href="mediciones.html"><i class="fa-solid fa-weight-scale"></i> Mediciones</a>
+                <a href="asistencias.html" class="activo"><i class="fa-solid fa-door-open"></i> Asistencias</a>
+                <a href="reportes.html"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+                <a href="#" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Registro de Asistencias</h1>
+                <div style="display:flex;gap:0.6rem">
+                    <button class="theme-toggle" title="Cambiar tema"><i class="fa-solid fa-sun"></i></button>
+                    <button class="btn btn-ghost" onclick="exportarCSV('tablaAsistencias','asistencias.csv')">
+                        <i class="fa-solid fa-file-csv"></i> Exportar CSV
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPIs -->
+            <div class="kpi-grid">
+                <div class="kpi success">
+                    <h4>Hoy en el gimnasio</h4>
+                    <div class="valor" id="kpiHoy">0</div>
+                </div>
+                <div class="kpi info">
+                    <h4>Actualmente dentro</h4>
+                    <div class="valor" id="kpiDentro">0</div>
+                </div>
+                <div class="kpi warning">
+                    <h4>Total registros</h4>
+                    <div class="valor" id="kpiTotal">0</div>
+                </div>
+            </div>
+
+            <!-- Registro rápido -->
+            <div class="card" style="margin:1.5rem 0">
+                <h3 style="margin-bottom:1rem"><i class="fa-solid fa-id-badge"></i> Registro rápido</h3>
+                <div class="grid grid-3" style="gap:1rem">
+                    <label>Cliente
+                        <select id="selCliente"></select>
+                    </label>
+                    <label>&nbsp;
+                        <button class="btn btn-primary" onclick="registrarEntrada()">
+                            <i class="fa-solid fa-right-to-bracket"></i> Registrar entrada
+                        </button>
+                    </label>
+                    <label>&nbsp;
+                        <button class="btn btn-ghost" onclick="registrarSalida()">
+                            <i class="fa-solid fa-right-from-bracket"></i> Registrar salida
+                        </button>
+                    </label>
+                </div>
+            </div>
+
+            <div class="tabla-wrap">
+                <div class="tabla-tools">
+                    <input type="text" id="buscar" placeholder="Buscar por cliente...">
+                    <select id="filtroEstado" class="select-inline">
+                        <option value="">Todos</option>
+                        <option value="dentro">Actualmente dentro</option>
+                        <option value="salio">Ya salieron</option>
+                    </select>
+                </div>
+                <table class="data" id="tablaAsistencias">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Entrada</th>
+                            <th>Salida</th>
+                            <th>Duración</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        const STORAGE_KEY = 'powerfit_asistencias';
+        const tbody = document.querySelector('#tablaAsistencias tbody');
+
+        // Datos demo
+        const ASIST_DEMO = [
+            { id: 1, cliente_id: 1, cliente: 'Juan Carlos Pérez',  entrada: '2026-05-22 07:30:00', salida: '2026-05-22 09:00:00' },
+            { id: 2, cliente_id: 2, cliente: 'María José López',   entrada: '2026-05-22 18:00:00', salida: null },
+            { id: 3, cliente_id: 3, cliente: 'Luis Andrés Castro', entrada: '2026-05-21 06:45:00', salida: '2026-05-21 08:15:00' }
+        ];
+
+        const cargarStore = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') || ASIST_DEMO;
+        const guardarStore = (arr) => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+
+        const fmtHora = (f) => f ? new Date(f).toLocaleString('es-CO', { dateStyle:'short', timeStyle:'short' }) : '-';
+
+        function duracion(ent, sal) {
+            if (!sal) return '<span class="badge-estado activo">en curso</span>';
+            const ms = new Date(sal) - new Date(ent);
+            if (ms < 0) return '-';
+            const min = Math.floor(ms / 60000);
+            const h = Math.floor(min / 60);
+            const m = min % 60;
+            return h ? `${h}h ${m}min` : `${m} min`;
+        }
+
+        function actualizarKPIs(lista) {
+            const hoy = new Date().toISOString().substring(0, 10);
+            document.getElementById('kpiHoy').textContent    = lista.filter(a => String(a.entrada).startsWith(hoy)).length;
+            document.getElementById('kpiDentro').textContent = lista.filter(a => !a.salida).length;
+            document.getElementById('kpiTotal').textContent  = lista.length;
+        }
+
+        function render() {
+            let lista = cargarStore();
+            const estado = document.getElementById('filtroEstado').value;
+            const visibles = lista.filter(a => {
+                if (estado === 'dentro') return !a.salida;
+                if (estado === 'salio')  return !!a.salida;
+                return true;
+            });
+            tbody.innerHTML = visibles.map(a => `
+                <tr>
+                    <td>${a.id}</td>
+                    <td>${a.cliente}</td>
+                    <td>${fmtHora(a.entrada)}</td>
+                    <td>${fmtHora(a.salida)}</td>
+                    <td>${duracion(a.entrada, a.salida)}</td>
+                    <td><span class="badge-estado ${a.salida ? 'inactivo' : 'activo'}">${a.salida ? 'salió' : 'dentro'}</span></td>
+                </tr>
+            `).join('') || '<tr><td colspan="6" style="text-align:center;color:#888">Sin asistencias</td></tr>';
+            actualizarKPIs(lista);
+        }
+
+        async function cargarClientes() {
+            const r = await api('../php/clientes.php?accion=listar');
+            const sel = document.getElementById('selCliente');
+            if (r.ok && Array.isArray(r.datos)) {
+                sel.innerHTML = '<option value="">-- Selecciona cliente --</option>' +
+                    r.datos.map(c => `<option value="${c.id_cliente}" data-nombre="${c.nombre} ${c.apellido}">${c.nombre} ${c.apellido} (${c.documento})</option>`).join('');
+            } else {
+                // Fallback: clientes locales
+                sel.innerHTML = `
+                    <option value="">-- Selecciona cliente --</option>
+                    <option value="1" data-nombre="Juan Carlos Pérez">Juan Carlos Pérez</option>
+                    <option value="2" data-nombre="María José López">María José López</option>
+                    <option value="3" data-nombre="Luis Andrés Castro">Luis Andrés Castro</option>
+                    <option value="4" data-nombre="Ana Lucía Vargas">Ana Lucía Vargas</option>
+                `;
+            }
+        }
+
+        function registrarEntrada() {
+            const sel = document.getElementById('selCliente');
+            const opt = sel.selectedOptions[0];
+            if (!opt || !sel.value) return toast('Selecciona un cliente', 'error');
+            const lista = cargarStore();
+            // Si ya tiene una entrada abierta, no permitir doble
+            if (lista.some(a => String(a.cliente_id) === sel.value && !a.salida)) {
+                return toast('Este cliente ya tiene una entrada abierta', 'error');
+            }
+            const nuevoId = lista.length ? Math.max(...lista.map(a => a.id)) + 1 : 1;
+            lista.push({
+                id: nuevoId,
+                cliente_id: Number(sel.value),
+                cliente: opt.dataset.nombre,
+                entrada: new Date().toISOString(),
+                salida: null
+            });
+            guardarStore(lista);
+            toast(`Entrada registrada: ${opt.dataset.nombre}`, 'ok');
+            render();
+        }
+
+        function registrarSalida() {
+            const sel = document.getElementById('selCliente');
+            if (!sel.value) return toast('Selecciona un cliente', 'error');
+            const lista = cargarStore();
+            const abierta = lista.find(a => String(a.cliente_id) === sel.value && !a.salida);
+            if (!abierta) return toast('Este cliente no tiene entrada abierta', 'error');
+            abierta.salida = new Date().toISOString();
+            guardarStore(lista);
+            toast('Salida registrada', 'ok');
+            render();
+        }
+
+        document.getElementById('filtroEstado').addEventListener('change', render);
+        filtrarTabla('buscar', 'tablaAsistencias');
+
+        cargarClientes();
+        render();
+    </script>
+</body>
+</html>

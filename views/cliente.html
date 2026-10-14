@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mi Portal - PowerFit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <a href="cliente.html" class="logo">
+                <i class="fa-solid fa-dumbbell"></i><span>Power<strong>Fit</strong></span>
+            </a>
+            <nav>
+                <a href="cliente.html" class="activo"><i class="fa-solid fa-house"></i> Mi inicio</a>
+                <a href="#misRutinas"><i class="fa-solid fa-clipboard-list"></i> Mis rutinas</a>
+                <a href="#misPlanes"><i class="fa-solid fa-apple-whole"></i> Mi nutrición</a>
+                <a href="#" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Mi Portal</h1>
+                <div style="display:flex;gap:0.6rem;align-items:center">
+                    <button class="theme-toggle" title="Cambiar tema"><i class="fa-solid fa-sun"></i></button>
+                    <div class="user-chip">
+                        <i class="fa-solid fa-user-circle"></i>
+                        <span id="userName">Cliente</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi info"><h4><i class="fa-solid fa-dumbbell"></i> Mi entrenador</h4><div class="valor" style="font-size:1.2rem" id="miEntrenador">—</div></div>
+                <div class="kpi success"><h4><i class="fa-solid fa-apple-whole"></i> Mi nutricionista</h4><div class="valor" style="font-size:1.2rem" id="miNutri">—</div></div>
+                <div class="kpi warning"><h4>Rutinas activas</h4><div class="valor" id="kpiRut">0</div></div>
+            </div>
+
+            <!-- MIS RUTINAS -->
+            <div class="tabla-wrap" id="misRutinas" style="margin-bottom:1.5rem">
+                <div class="topbar-sec"><h2><i class="fa-solid fa-clipboard-list"></i> Mis rutinas</h2></div>
+                <div id="listaRutinas" class="portal-cards"></div>
+            </div>
+
+            <!-- MIS PLANES -->
+            <div class="tabla-wrap" id="misPlanes">
+                <div class="topbar-sec"><h2><i class="fa-solid fa-apple-whole"></i> Mi plan nutricional</h2></div>
+                <div id="listaPlanes" class="portal-cards"></div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        .portal-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:1rem; padding:0.5rem; }
+        .portal-card { background:var(--bg-200,#1c1c24); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:1.2rem 1.4rem; }
+        .portal-card h3 { margin:0 0 .3rem; color:var(--primary,#ff3d2e); }
+        .portal-card .meta { display:flex; gap:.5rem; flex-wrap:wrap; margin:.6rem 0; }
+        .portal-card .macro { background:rgba(255,255,255,.06); padding:.35rem .7rem; border-radius:8px; font-size:.85rem; }
+        .portal-card pre { white-space:pre-wrap; font-family:inherit; background:rgba(255,255,255,.04); padding:.7rem; border-radius:8px; margin:.5rem 0 0; font-size:.9rem; line-height:1.5; }
+        .portal-card .notas { margin-top:.6rem; font-size:.88rem; color:var(--text-300,#9a9aa5); }
+        .portal-empty { text-align:center; color:#888; padding:1.5rem; }
+    </style>
+
+    <script src="../js/script.js"></script>
+    <script>
+        // Solo clientes
+        const USUARIO = requireRol('cliente');
+        if (!USUARIO) throw new Error('redirect');
+        const CLIENTE_ID = Number(USUARIO.id);
+
+        const getClientes = () => JSON.parse(localStorage.getItem('powerfit_clientes') || '[]');
+        const getRutinas  = () => JSON.parse(localStorage.getItem('powerfit_rutinas')  || '[]');
+        const getPlanes   = () => JSON.parse(localStorage.getItem('powerfit_planes_nutri') || '[]');
+        const getPersonal = () => JSON.parse(localStorage.getItem('powerfit_personal') || '[]');
+        const getRutAsig  = () => JSON.parse(localStorage.getItem('powerfit_rutinas_asig') || '[]');
+        const getPlanAsig = () => JSON.parse(localStorage.getItem('powerfit_planes_asig') || '[]');
+
+        const yo = () => getClientes().find(c => Number(c.id_cliente) === CLIENTE_ID) || {};
+        const nombrePersonal = (id) => {
+            const p = getPersonal().find(x => Number(x.id) === Number(id));
+            return p ? `${p.nombre}${p.especialidad ? ' · ' + p.especialidad : ''}` : 'Sin asignar';
+        };
+        const buscarRutina = (id) => getRutinas().find(r => Number(r.id_rutina) === Number(id));
+        const buscarPlan   = (id) => getPlanes().find(p => Number(p.id) === Number(id));
+        const num = (n) => Number(n || 0).toLocaleString('es-CO');
+
+        function renderEncabezado() {
+            const c = yo();
+            document.getElementById('miEntrenador').textContent = c.entrenador_id ? nombrePersonal(c.entrenador_id) : 'Sin asignar';
+            document.getElementById('miNutri').textContent      = c.nutricionista_id ? nombrePersonal(c.nutricionista_id) : 'Sin asignar';
+        }
+
+        function renderRutinas() {
+            const cont = document.getElementById('listaRutinas');
+            const asigs = getRutAsig().filter(a => Number(a.cliente_id) === CLIENTE_ID);
+            document.getElementById('kpiRut').textContent = asigs.filter(a => a.estado === 'activa').length;
+            if (!asigs.length) { cont.innerHTML = '<p class="portal-empty">Tu entrenador aún no te ha asignado una rutina.</p>'; return; }
+            cont.innerHTML = asigs.map(a => {
+                const r = buscarRutina(a.rutina_id) || {};
+                return `
+                <div class="portal-card">
+                    <h3>${r.nombre || 'Rutina'}</h3>
+                    <div class="meta">
+                        <span class="macro">${r.nivel || '—'}</span>
+                        <span class="macro">${r.objetivo || '—'}</span>
+                        <span class="badge-estado ${a.estado === 'activa' ? 'activo' : 'inactivo'}">${a.estado}</span>
+                    </div>
+                    <small style="color:var(--text-300)">${formatoFecha(a.fecha_inicio)}${a.fecha_fin ? ' → ' + formatoFecha(a.fecha_fin) : ''}</small>
+                    ${r.descripcion ? `<pre>${r.descripcion}</pre>` : ''}
+                    ${a.notas ? `<div class="notas"><i class="fa-solid fa-note-sticky"></i> ${a.notas}</div>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        function renderPlanes() {
+            const cont = document.getElementById('listaPlanes');
+            const asigs = getPlanAsig().filter(a => Number(a.cliente_id) === CLIENTE_ID);
+            if (!asigs.length) { cont.innerHTML = '<p class="portal-empty">Tu nutricionista aún no te ha asignado un plan.</p>'; return; }
+            cont.innerHTML = asigs.map(a => {
+                const p = buscarPlan(a.plan_id) || {};
+                return `
+                <div class="portal-card">
+                    <h3>${p.nombre || 'Plan'}</h3>
+                    <div class="meta">
+                        <span class="macro"><strong>${num(p.calorias)}</strong> kcal</span>
+                        <span class="macro">Prot ${p.proteina || 0}g</span>
+                        <span class="macro">Carb ${p.carbohidratos || 0}g</span>
+                        <span class="macro">Grasa ${p.grasas || 0}g</span>
+                        <span class="badge-estado ${a.estado === 'activo' ? 'activo' : 'inactivo'}">${a.estado}</span>
+                    </div>
+                    ${p.comidas ? `<pre>${p.comidas}</pre>` : ''}
+                    ${p.recomendaciones ? `<div class="notas"><i class="fa-solid fa-circle-info"></i> ${p.recomendaciones}</div>` : ''}
+                    ${a.notas ? `<div class="notas"><i class="fa-solid fa-note-sticky"></i> ${a.notas}</div>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        renderEncabezado();
+        renderRutinas();
+        renderPlanes();
+    </script>
+</body>
+</html>

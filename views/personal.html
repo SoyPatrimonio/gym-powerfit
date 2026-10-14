@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personal - PowerFit Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <a href="dashboard.html" class="logo">
+                <i class="fa-solid fa-dumbbell"></i><span>Power<strong>Fit</strong></span>
+            </a>
+            <nav>
+                <a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+                <a href="clientes.html"><i class="fa-solid fa-users"></i> Clientes</a>
+                <a href="personal.html" class="activo"><i class="fa-solid fa-user-tie"></i> Personal</a>
+                <a href="membresias.html"><i class="fa-solid fa-id-card"></i> Membresías</a>
+                <a href="pagos.html"><i class="fa-solid fa-credit-card"></i> Pagos</a>
+                <a href="productos.html"><i class="fa-solid fa-bottle-water"></i> Productos</a>
+                <a href="reservas.html"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+                <a href="rutinas.html"><i class="fa-solid fa-clipboard-list"></i> Rutinas</a>
+                <a href="planes-nutricionales.html"><i class="fa-solid fa-apple-whole"></i> Nutrición</a>
+                <a href="asignaciones.html"><i class="fa-solid fa-link"></i> Asignaciones</a>
+                <a href="mediciones.html"><i class="fa-solid fa-weight-scale"></i> Mediciones</a>
+                <a href="asistencias.html"><i class="fa-solid fa-door-open"></i> Asistencias</a>
+                <a href="reportes.html"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+                <a href="#" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Personal del Gimnasio</h1>
+                <div style="display:flex;gap:0.6rem">
+                    <button class="theme-toggle" title="Cambiar tema"><i class="fa-solid fa-sun"></i></button>
+                    <button class="btn btn-ghost" onclick="exportarCSV('tablaPersonal','personal.csv')">
+                        <i class="fa-solid fa-file-csv"></i> Exportar
+                    </button>
+                    <button class="btn btn-primary" onclick="abrirNuevo()">
+                        <i class="fa-solid fa-plus"></i> Nuevo personal
+                    </button>
+                </div>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi"><h4>Total personal</h4><div class="valor" id="kpiTotal">0</div></div>
+                <div class="kpi info"><h4>Entrenadores</h4><div class="valor" id="kpiEnt">0</div></div>
+                <div class="kpi success"><h4>Nutricionistas</h4><div class="valor" id="kpiNut">0</div></div>
+                <div class="kpi warning"><h4>Clientes asignados</h4><div class="valor" id="kpiAsig">0</div></div>
+            </div>
+
+            <div class="tabla-wrap">
+                <div class="tabla-tools">
+                    <input type="text" id="buscar" placeholder="Buscar por nombre, especialidad...">
+                    <select id="filtroTipo" class="select-inline">
+                        <option value="">Todos los tipos</option>
+                        <option value="entrenador">Entrenadores</option>
+                        <option value="nutricionista">Nutricionistas</option>
+                    </select>
+                </div>
+                <table class="data" id="tablaPersonal">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Especialidad</th>
+                            <th>Teléfono</th>
+                            <th>Email</th>
+                            <th>Clientes</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-bg" id="modalPersonal">
+        <div class="modal">
+            <button class="modal-close" onclick="cerrarModal('modalPersonal')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 id="modalTitulo">Nuevo personal</h3>
+            <form class="form" id="formPersonal">
+                <input type="hidden" name="id" />
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Nombre completo <input type="text" name="nombre" required></label>
+                    <label>Tipo
+                        <select name="tipo" required>
+                            <option value="entrenador">Entrenador</option>
+                            <option value="nutricionista">Nutricionista</option>
+                        </select>
+                    </label>
+                </div>
+                <label>Especialidad
+                    <input type="text" name="especialidad" placeholder="Ej: Powerlifting, CrossFit, Dieta deportiva...">
+                </label>
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Teléfono <input type="tel" name="telefono" placeholder="320 123 4567"></label>
+                    <label>Email <input type="email" name="email"></label>
+                </div>
+                <label>Certificaciones <textarea name="certificaciones" rows="2" placeholder="Lista de certificaciones..."></textarea></label>
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Horario <input type="text" name="horario" placeholder="Lun-Vie 6am-2pm"></label>
+                    <label>Estado
+                        <select name="estado">
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <small class="msg" id="msgPersonal"></small>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        const DEMO = [
+            { id:1, nombre:'Carlos Ramírez',  tipo:'entrenador',   especialidad:'Powerlifting & Fuerza', telefono:'320 111 2233', email:'carlos@powerfit.com',  certificaciones:'NSCA-CSCS, Powerlifting L2', horario:'Lun-Vie 6am-2pm',  estado:'activo' },
+            { id:2, nombre:'Daniela Torres',  tipo:'entrenador',   especialidad:'Funcional & HIIT',      telefono:'310 222 3344', email:'daniela@powerfit.com', certificaciones:'CrossFit L2, ACE-PT',         horario:'Lun-Sáb 2pm-9pm',  estado:'activo' },
+            { id:3, nombre:'Laura Quintero',  tipo:'entrenador',   especialidad:'Zumba & Pilates',       telefono:'315 333 4455', email:'laura@powerfit.com',   certificaciones:'Zumba Basic 1-2, Mat Pilates', horario:'Mar-Sáb 4pm-9pm',  estado:'activo' },
+            { id:4, nombre:'Andrés Mejía',    tipo:'nutricionista',especialidad:'Nutrición Deportiva',   telefono:'301 444 5566', email:'andres@powerfit.com',  certificaciones:'Nutricionista titulado, ISSN',  horario:'Lun-Vie 9am-5pm',  estado:'activo' },
+            { id:5, nombre:'Valentina Cruz',  tipo:'nutricionista',especialidad:'Pérdida de grasa',      telefono:'312 555 6677', email:'valentina@powerfit.com',certificaciones:'Nutrición clínica, Especialista en obesidad', horario:'Lun-Vie 2pm-8pm', estado:'activo' }
+        ];
+        const store = demoStore('powerfit_personal', DEMO);
+        const tbody = document.querySelector('#tablaPersonal tbody');
+        const formP = document.getElementById('formPersonal');
+
+        function clientesAsignados(personalId, tipo) {
+            const clientes = JSON.parse(localStorage.getItem('powerfit_clientes') || '[]');
+            const campo = tipo === 'entrenador' ? 'entrenador_id' : 'nutricionista_id';
+            return clientes.filter(c => Number(c[campo]) === personalId).length;
+        }
+
+        function actualizarKPIs(lista) {
+            document.getElementById('kpiTotal').textContent = lista.length;
+            document.getElementById('kpiEnt').textContent   = lista.filter(p => p.tipo === 'entrenador').length;
+            document.getElementById('kpiNut').textContent   = lista.filter(p => p.tipo === 'nutricionista').length;
+            document.getElementById('kpiAsig').textContent  = lista.reduce((s, p) => s + clientesAsignados(p.id, p.tipo), 0);
+        }
+
+        function render() {
+            const lista = store.all();
+            const tipo = document.getElementById('filtroTipo').value;
+            const visibles = lista.filter(p => !tipo || p.tipo === tipo);
+            tbody.innerHTML = visibles.map(p => `
+                <tr>
+                    <td>${p.id}</td>
+                    <td>
+                        <strong>${p.nombre}</strong>
+                        <br><small style="color:var(--text-300)">${p.email || ''}</small>
+                    </td>
+                    <td><span class="badge-tipo ${p.tipo}"><i class="fa-solid ${p.tipo === 'entrenador' ? 'fa-dumbbell' : 'fa-apple-whole'}"></i> ${p.tipo === 'entrenador' ? 'Entrenador' : 'Nutricionista'}</span></td>
+                    <td>${p.especialidad || '-'}</td>
+                    <td>${p.telefono || '-'}</td>
+                    <td>${p.email || '-'}</td>
+                    <td><strong>${clientesAsignados(p.id, p.tipo)}</strong></td>
+                    <td><span class="badge-estado ${p.estado === 'activo' ? 'activo' : 'inactivo'}">${p.estado}</span></td>
+                    <td class="acciones">
+                        <button onclick="editar(${p.id})" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-del" onclick="eliminar(${p.id})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="9" style="text-align:center;color:#888">Sin personal</td></tr>';
+            actualizarKPIs(lista);
+        }
+
+        function abrirNuevo() {
+            formP.reset();
+            formP.id.value = '';
+            document.getElementById('modalTitulo').textContent = 'Nuevo personal';
+            abrirModal('modalPersonal');
+        }
+
+        function editar(id) {
+            const p = store.all().find(x => x.id === id);
+            if (!p) return;
+            for (const k in p) {
+                if (formP[k] !== undefined) formP[k].value = p[k];
+            }
+            document.getElementById('modalTitulo').textContent = 'Editar personal';
+            abrirModal('modalPersonal');
+        }
+
+        function eliminar(id) {
+            if (!confirm('¿Eliminar este miembro del personal?')) return;
+            store.save(store.all().filter(p => p.id !== id));
+            toast('Personal eliminado', 'ok');
+            render();
+        }
+
+        formP.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const datos = Object.fromEntries(new FormData(formP));
+            const lista = store.all();
+            if (datos.id) {
+                const i = lista.findIndex(p => p.id === Number(datos.id));
+                if (i >= 0) lista[i] = { ...lista[i], ...datos, id: lista[i].id };
+            } else {
+                datos.id = store.nextId('id');
+                lista.push(datos);
+            }
+            store.save(lista);
+            toast('Personal guardado', 'ok');
+            cerrarModal('modalPersonal');
+            render();
+        });
+
+        document.getElementById('filtroTipo').addEventListener('change', render);
+        filtrarTabla('buscar', 'tablaPersonal');
+        render();
+    </script>
+</body>
+</html>

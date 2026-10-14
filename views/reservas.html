@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reservas - PowerFit Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <a href="dashboard.html" class="logo">
+                <i class="fa-solid fa-dumbbell"></i><span>Power<strong>Fit</strong></span>
+            </a>
+            <nav>
+                <a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+                <a href="clientes.html"><i class="fa-solid fa-users"></i> Clientes</a>
+                <a href="personal.html"><i class="fa-solid fa-user-tie"></i> Personal</a>
+                <a href="membresias.html"><i class="fa-solid fa-id-card"></i> Membresías</a>
+                <a href="pagos.html"><i class="fa-solid fa-credit-card"></i> Pagos</a>
+                <a href="productos.html"><i class="fa-solid fa-bottle-water"></i> Productos</a>
+                <a href="reservas.html" class="activo"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+                <a href="rutinas.html"><i class="fa-solid fa-clipboard-list"></i> Rutinas</a>
+                <a href="planes-nutricionales.html"><i class="fa-solid fa-apple-whole"></i> Nutrición</a>
+                <a href="asignaciones.html"><i class="fa-solid fa-link"></i> Asignaciones</a>
+                <a href="mediciones.html"><i class="fa-solid fa-weight-scale"></i> Mediciones</a>
+                <a href="asistencias.html"><i class="fa-solid fa-door-open"></i> Asistencias</a>
+                <a href="reportes.html"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+                <a href="#" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Reservas de Clases</h1>
+                <div style="display:flex;gap:0.6rem">
+                    <button class="theme-toggle" title="Cambiar tema"><i class="fa-solid fa-sun"></i></button>
+                    <button class="btn btn-ghost" onclick="exportarCSV('tablaReservas','reservas.csv')">
+                        <i class="fa-solid fa-file-csv"></i> Exportar
+                    </button>
+                    <button class="btn btn-primary" onclick="abrirNuevo()">
+                        <i class="fa-solid fa-plus"></i> Nueva reserva
+                    </button>
+                </div>
+            </div>
+
+            <!-- Calendario semanal -->
+            <div class="card" style="margin-bottom:1.5rem">
+                <h3 style="margin-bottom:1rem"><i class="fa-solid fa-calendar-week"></i> Vista semanal</h3>
+                <div class="calendario" id="calSemana"></div>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi success"><h4>Reservas hoy</h4><div class="valor" id="kpiHoy">0</div></div>
+                <div class="kpi info"><h4>Reservas esta semana</h4><div class="valor" id="kpiSemana">0</div></div>
+                <div class="kpi warning"><h4>Clase más popular</h4><div class="valor" style="font-size:1.4rem" id="kpiPop">--</div></div>
+                <div class="kpi"><h4>Total reservas</h4><div class="valor" id="kpiTotal">0</div></div>
+            </div>
+
+            <div class="tabla-wrap">
+                <div class="tabla-tools">
+                    <input type="text" id="buscar" placeholder="Buscar por cliente o clase...">
+                    <select id="filtroClase" class="select-inline">
+                        <option value="">Todas las clases</option>
+                        <option>Spinning</option>
+                        <option>Yoga</option>
+                        <option>Crossfit</option>
+                        <option>Zumba</option>
+                        <option>Funcional</option>
+                        <option>HIIT</option>
+                        <option>Boxeo</option>
+                        <option>Pilates</option>
+                    </select>
+                    <select id="filtroEstado" class="select-inline">
+                        <option value="">Todos los estados</option>
+                        <option value="confirmada">Confirmadas</option>
+                        <option value="cancelada">Canceladas</option>
+                        <option value="completada">Completadas</option>
+                    </select>
+                </div>
+                <table class="data" id="tablaReservas">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Clase</th>
+                            <th>Instructor</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-bg" id="modalRes">
+        <div class="modal">
+            <button class="modal-close" onclick="cerrarModal('modalRes')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 id="modalTitulo">Nueva reserva</h3>
+            <form class="form" id="formRes">
+                <input type="hidden" name="id" />
+                <label>Cliente <input type="text" name="cliente" required placeholder="Nombre del cliente"></label>
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Clase
+                        <select name="clase" required>
+                            <option>Spinning</option>
+                            <option>Yoga</option>
+                            <option>Crossfit</option>
+                            <option>Zumba</option>
+                            <option>Funcional</option>
+                            <option>HIIT</option>
+                            <option>Boxeo</option>
+                            <option>Pilates</option>
+                        </select>
+                    </label>
+                    <label>Instructor
+                        <select name="instructor">
+                            <option>Carlos Ramírez</option>
+                            <option>Daniela Torres</option>
+                            <option>Andrés Mejía</option>
+                            <option>Laura Quintero</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Fecha <input type="date" name="fecha" required></label>
+                    <label>Hora <input type="time" name="hora" required></label>
+                </div>
+                <label>Estado
+                    <select name="estado">
+                        <option value="confirmada">Confirmada</option>
+                        <option value="cancelada">Cancelada</option>
+                        <option value="completada">Completada</option>
+                    </select>
+                </label>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <small class="msg" id="msgRes"></small>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        const STORAGE_KEY = 'powerfit_reservas';
+        const tbody = document.querySelector('#tablaReservas tbody');
+        const formRes = document.getElementById('formRes');
+
+        const hoy = new Date();
+        const f = (d) => d.toISOString().substring(0, 10);
+        const DEMO = [
+            { id:1, cliente:'Juan Carlos Pérez',  clase:'Spinning', instructor:'Carlos Ramírez', fecha:f(hoy), hora:'06:00', estado:'confirmada' },
+            { id:2, cliente:'María José López',   clase:'Yoga',     instructor:'Daniela Torres', fecha:f(hoy), hora:'09:00', estado:'confirmada' },
+            { id:3, cliente:'Luis Andrés Castro', clase:'Crossfit', instructor:'Carlos Ramírez', fecha:f(hoy), hora:'17:00', estado:'confirmada' },
+            { id:4, cliente:'Ana Lucía Vargas',   clase:'Zumba',    instructor:'Laura Quintero', fecha:f(hoy), hora:'19:00', estado:'completada' },
+            { id:5, cliente:'Juan Carlos Pérez',  clase:'HIIT',     instructor:'Daniela Torres', fecha:f(new Date(hoy.getTime()+86400000)), hora:'19:00', estado:'confirmada' },
+            { id:6, cliente:'María José López',   clase:'Pilates',  instructor:'Daniela Torres', fecha:f(new Date(hoy.getTime()+172800000)), hora:'09:00', estado:'cancelada' }
+        ];
+
+        const cargarStore = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') || DEMO;
+        const guardarStore = (arr) => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+
+        const NOMBRES_DIA = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+
+        function renderCalendario(lista) {
+            const cal = document.getElementById('calSemana');
+            const inicioSem = new Date(hoy);
+            inicioSem.setDate(hoy.getDate() - hoy.getDay());
+            let html = '';
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(inicioSem);
+                d.setDate(inicioSem.getDate() + i);
+                const fechaStr = f(d);
+                const reservasDia = lista.filter(r => r.fecha === fechaStr && r.estado !== 'cancelada');
+                const esHoy = fechaStr === f(hoy);
+                html += `
+                    <div class="cal-dia${esHoy ? ' es-hoy' : ''}">
+                        <div class="cal-dia-titulo">${NOMBRES_DIA[d.getDay()]} <small>${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}</small></div>
+                        ${reservasDia.length ? reservasDia.map(r => `
+                            <div class="cal-evento">
+                                <strong>${r.hora}</strong> ${r.clase}
+                                <small>${r.cliente.split(' ')[0]}</small>
+                            </div>
+                        `).join('') : '<div class="cal-vacio">Sin reservas</div>'}
+                    </div>
+                `;
+            }
+            cal.innerHTML = html;
+        }
+
+        function actualizarKPIs(lista) {
+            const hoyStr = f(hoy);
+            const semanaInicio = new Date(hoy);
+            semanaInicio.setDate(hoy.getDate() - hoy.getDay());
+            const semanaFin = new Date(semanaInicio);
+            semanaFin.setDate(semanaInicio.getDate() + 7);
+
+            document.getElementById('kpiHoy').textContent = lista.filter(r => r.fecha === hoyStr && r.estado !== 'cancelada').length;
+            document.getElementById('kpiSemana').textContent = lista.filter(r => {
+                const d = new Date(r.fecha);
+                return d >= semanaInicio && d < semanaFin && r.estado !== 'cancelada';
+            }).length;
+
+            // Clase más popular
+            const counts = {};
+            lista.forEach(r => { counts[r.clase] = (counts[r.clase] || 0) + 1; });
+            const top = Object.entries(counts).sort((a,b) => b[1]-a[1])[0];
+            document.getElementById('kpiPop').textContent = top ? top[0] : '--';
+            document.getElementById('kpiTotal').textContent = lista.length;
+        }
+
+        function render() {
+            const lista = cargarStore();
+            const clase = document.getElementById('filtroClase').value;
+            const estado = document.getElementById('filtroEstado').value;
+            const visibles = lista.filter(r =>
+                (!clase || r.clase === clase) &&
+                (!estado || r.estado === estado)
+            ).sort((a,b) => (a.fecha+a.hora).localeCompare(b.fecha+b.hora));
+
+            tbody.innerHTML = visibles.map(r => `
+                <tr>
+                    <td>${r.id}</td>
+                    <td>${r.cliente}</td>
+                    <td><strong>${r.clase}</strong></td>
+                    <td>${r.instructor}</td>
+                    <td>${formatoFecha(r.fecha)}</td>
+                    <td>${r.hora}</td>
+                    <td><span class="badge-estado ${r.estado === 'cancelada' ? 'inactivo' : 'activo'}">${r.estado}</span></td>
+                    <td class="acciones">
+                        <button onclick="editar(${r.id})" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-del" onclick="eliminar(${r.id})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="8" style="text-align:center;color:#888">Sin reservas</td></tr>';
+
+            renderCalendario(lista);
+            actualizarKPIs(lista);
+        }
+
+        function abrirNuevo() {
+            formRes.reset();
+            formRes.id.value = '';
+            formRes.fecha.value = f(hoy);
+            document.getElementById('modalTitulo').textContent = 'Nueva reserva';
+            abrirModal('modalRes');
+        }
+
+        function editar(id) {
+            const r = cargarStore().find(x => x.id === id);
+            if (!r) return;
+            formRes.id.value         = r.id;
+            formRes.cliente.value    = r.cliente;
+            formRes.clase.value      = r.clase;
+            formRes.instructor.value = r.instructor;
+            formRes.fecha.value      = r.fecha;
+            formRes.hora.value       = r.hora;
+            formRes.estado.value     = r.estado;
+            document.getElementById('modalTitulo').textContent = 'Editar reserva';
+            abrirModal('modalRes');
+        }
+
+        function eliminar(id) {
+            if (!confirm('¿Eliminar esta reserva?')) return;
+            guardarStore(cargarStore().filter(r => r.id !== id));
+            toast('Reserva eliminada', 'ok');
+            render();
+        }
+
+        formRes.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const datos = Object.fromEntries(new FormData(formRes));
+            const lista = cargarStore();
+            if (datos.id) {
+                const i = lista.findIndex(r => r.id === Number(datos.id));
+                if (i >= 0) lista[i] = { ...lista[i], ...datos, id: lista[i].id };
+            } else {
+                datos.id = lista.length ? Math.max(...lista.map(r => r.id)) + 1 : 1;
+                lista.push(datos);
+            }
+            guardarStore(lista);
+            toast('Reserva guardada', 'ok');
+            cerrarModal('modalRes');
+            render();
+        });
+
+        document.getElementById('filtroClase').addEventListener('change', render);
+        document.getElementById('filtroEstado').addEventListener('change', render);
+        filtrarTabla('buscar', 'tablaReservas');
+        render();
+    </script>
+</body>
+</html>

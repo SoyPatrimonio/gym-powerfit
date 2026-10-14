@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Planes Nutricionales - PowerFit Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <a href="dashboard.html" class="logo">
+                <i class="fa-solid fa-dumbbell"></i><span>Power<strong>Fit</strong></span>
+            </a>
+            <nav>
+                <a href="dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+                <a href="clientes.html"><i class="fa-solid fa-users"></i> Clientes</a>
+                <a href="personal.html"><i class="fa-solid fa-user-tie"></i> Personal</a>
+                <a href="membresias.html"><i class="fa-solid fa-id-card"></i> Membresías</a>
+                <a href="pagos.html"><i class="fa-solid fa-credit-card"></i> Pagos</a>
+                <a href="productos.html"><i class="fa-solid fa-bottle-water"></i> Productos</a>
+                <a href="reservas.html"><i class="fa-solid fa-calendar-check"></i> Reservas</a>
+                <a href="rutinas.html"><i class="fa-solid fa-clipboard-list"></i> Rutinas</a>
+                <a href="planes-nutricionales.html" class="activo"><i class="fa-solid fa-apple-whole"></i> Nutrición</a>
+                <a href="asignaciones.html"><i class="fa-solid fa-link"></i> Asignaciones</a>
+                <a href="mediciones.html"><i class="fa-solid fa-weight-scale"></i> Mediciones</a>
+                <a href="asistencias.html"><i class="fa-solid fa-door-open"></i> Asistencias</a>
+                <a href="reportes.html"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+                <a href="#" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Planes Nutricionales</h1>
+                <div style="display:flex;gap:0.6rem">
+                    <button class="theme-toggle" title="Cambiar tema"><i class="fa-solid fa-sun"></i></button>
+                    <button class="btn btn-ghost" onclick="exportarCSV('tablaPlanes','planes_nutricionales.csv')">
+                        <i class="fa-solid fa-file-csv"></i> Exportar
+                    </button>
+                    <button class="btn btn-primary" onclick="abrirNuevo()">
+                        <i class="fa-solid fa-plus"></i> Nuevo plan
+                    </button>
+                </div>
+            </div>
+
+            <div class="tabla-wrap">
+                <div class="tabla-tools">
+                    <input type="text" id="buscar" placeholder="Buscar por nombre u objetivo...">
+                    <select id="filtroObjetivo" class="select-inline">
+                        <option value="">Todos los objetivos</option>
+                        <option>Perder grasa</option>
+                        <option>Ganar masa muscular</option>
+                        <option>Mantener</option>
+                        <option>Definición</option>
+                        <option>Rendimiento</option>
+                    </select>
+                </div>
+                <table class="data" id="tablaPlanes">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Objetivo</th>
+                            <th>Calorías/día</th>
+                            <th>Proteína</th>
+                            <th>Carbos</th>
+                            <th>Grasas</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-bg" id="modalPlan">
+        <div class="modal">
+            <button class="modal-close" onclick="cerrarModal('modalPlan')"><i class="fa-solid fa-xmark"></i></button>
+            <h3 id="modalTitulo">Nuevo plan nutricional</h3>
+            <form class="form" id="formPlan">
+                <input type="hidden" name="id" />
+                <label>Nombre <input type="text" name="nombre" required></label>
+                <div class="grid grid-2" style="gap:1rem">
+                    <label>Objetivo
+                        <select name="objetivo" required>
+                            <option>Perder grasa</option>
+                            <option>Ganar masa muscular</option>
+                            <option>Mantener</option>
+                            <option>Definición</option>
+                            <option>Rendimiento</option>
+                        </select>
+                    </label>
+                    <label>Calorías diarias (kcal) <input type="number" name="calorias" min="800" max="6000" required></label>
+                </div>
+                <div class="grid grid-3" style="gap:1rem">
+                    <label>Proteína (g) <input type="number" name="proteina" min="0" step="5"></label>
+                    <label>Carbohidratos (g) <input type="number" name="carbohidratos" min="0" step="5"></label>
+                    <label>Grasas (g) <input type="number" name="grasas" min="0" step="5"></label>
+                </div>
+                <label>Comidas sugeridas
+                    <textarea name="comidas" rows="4" placeholder="Ej:&#10;Desayuno: avena con frutas y huevos&#10;Almuerzo: pollo con arroz integral y ensalada&#10;Cena: pescado con verduras"></textarea>
+                </label>
+                <label>Recomendaciones <textarea name="recomendaciones" rows="2" placeholder="Suplementos, hidratación, horarios..."></textarea></label>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <small class="msg" id="msgPlan"></small>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        const DEMO = [
+            { id:1, nombre:'Cutting Hombre 80kg',  objetivo:'Perder grasa',         calorias:2000, proteina:180, carbohidratos:180, grasas:55, comidas:'Desayuno: claras + avena + frutos rojos\nMedia mañana: yogur griego + almendras\nAlmuerzo: pollo + arroz + ensalada\nMerienda: shake de proteína + manzana\nCena: pescado + brócoli', recomendaciones:'2.5 L agua/día, evitar azúcares simples, déficit de 500 kcal.' },
+            { id:2, nombre:'Bulking Limpio',        objetivo:'Ganar masa muscular',  calorias:3200, proteina:200, carbohidratos:400, grasas:90, comidas:'Desayuno: 4 huevos + 2 panes + plátano\nMedia mañana: batido + nueces\nAlmuerzo: 200g carne + papa + ensalada\nMerienda: arroz + atún\nCena: salmón + quinoa + aguacate', recomendaciones:'Surplus de 400 kcal, creatina 5g/día.' },
+            { id:3, nombre:'Mantenimiento Mujer',   objetivo:'Mantener',             calorias:1800, proteina:130, carbohidratos:200, grasas:60, comidas:'Desayuno: tostadas + huevo + fruta\nAlmuerzo: pollo + quinoa + verduras\nMerienda: yogur + fresas\nCena: omelette + ensalada',                                                                                            recomendaciones:'Balance macros, 5 comidas pequeñas.' },
+            { id:4, nombre:'Definición Avanzada',   objetivo:'Definición',           calorias:1700, proteina:200, carbohidratos:130, grasas:50, comidas:'Desayuno: claras + avena\nAlmuerzo: pescado + verduras\nMerienda: pollo + ensalada\nCena: tortilla francesa + espinacas',                                                                                       recomendaciones:'Sin lácteos, sodio bajo. Cardio en ayunas opcional.' },
+            { id:5, nombre:'Vegetariano Volumen',   objetivo:'Ganar masa muscular',  calorias:2800, proteina:160, carbohidratos:380, grasas:85, comidas:'Desayuno: tofu scramble + pan integral\nAlmuerzo: lentejas + arroz + aguacate\nMerienda: hummus + zanahorias\nCena: tempeh + quinoa + verduras',                                                                  recomendaciones:'Vitamina B12, proteína vegetal combinada.' }
+        ];
+        const store = demoStore('powerfit_planes_nutri', DEMO);
+        const tbody = document.querySelector('#tablaPlanes tbody');
+        const formPlan = document.getElementById('formPlan');
+
+        function render() {
+            const lista = store.all();
+            const obj = document.getElementById('filtroObjetivo').value;
+            const visibles = lista.filter(p => !obj || p.objetivo === obj);
+            tbody.innerHTML = visibles.map(p => `
+                <tr>
+                    <td>${p.id}</td>
+                    <td>
+                        <strong>${p.nombre}</strong>
+                        <br><small style="color:var(--text-300)">${(p.recomendaciones || '').substring(0, 60)}${(p.recomendaciones||'').length > 60 ? '…' : ''}</small>
+                    </td>
+                    <td><span class="badge-estado activo">${p.objetivo}</span></td>
+                    <td><strong>${Number(p.calorias).toLocaleString('es-CO')}</strong> kcal</td>
+                    <td>${p.proteina || 0}g</td>
+                    <td>${p.carbohidratos || 0}g</td>
+                    <td>${p.grasas || 0}g</td>
+                    <td class="acciones">
+                        <button onclick="verDetalle(${p.id})" title="Ver detalle"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="editar(${p.id})" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-del" onclick="eliminar(${p.id})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="8" style="text-align:center;color:#888">Sin planes</td></tr>';
+        }
+
+        function abrirNuevo() {
+            formPlan.reset();
+            formPlan.id.value = '';
+            document.getElementById('modalTitulo').textContent = 'Nuevo plan nutricional';
+            abrirModal('modalPlan');
+        }
+
+        function editar(id) {
+            const p = store.all().find(x => x.id === id);
+            if (!p) return;
+            for (const k in p) if (formPlan[k] !== undefined) formPlan[k].value = p[k];
+            document.getElementById('modalTitulo').textContent = 'Editar plan nutricional';
+            abrirModal('modalPlan');
+        }
+
+        function verDetalle(id) {
+            const p = store.all().find(x => x.id === id);
+            if (!p) return;
+            const w = window.open('', '_blank', 'width=600,height=700');
+            w.document.write(`
+                <html><head><title>${p.nombre}</title>
+                <style>body{font-family:Poppins,Arial,sans-serif;padding:30px;color:#15151b;max-width:600px;margin:0 auto}
+                h1{color:#ff3d2e}h3{color:#ff8a00;border-bottom:1px solid #eee;padding-bottom:6px;margin-top:24px}
+                .macro{display:inline-block;background:#f5f5f7;padding:8px 16px;border-radius:8px;margin:4px}
+                pre{background:#f5f5f7;padding:12px;border-radius:8px;white-space:pre-wrap;font-family:inherit}
+                </style></head><body>
+                <h1>${p.nombre}</h1>
+                <p><strong>Objetivo:</strong> ${p.objetivo}</p>
+                <div>
+                    <span class="macro"><strong>${Number(p.calorias).toLocaleString('es-CO')}</strong> kcal/día</span>
+                    <span class="macro">Proteína: <strong>${p.proteina}g</strong></span>
+                    <span class="macro">Carbos: <strong>${p.carbohidratos}g</strong></span>
+                    <span class="macro">Grasas: <strong>${p.grasas}g</strong></span>
+                </div>
+                <h3>Comidas sugeridas</h3>
+                <pre>${p.comidas || 'Sin información'}</pre>
+                <h3>Recomendaciones</h3>
+                <pre>${p.recomendaciones || 'Sin información'}</pre>
+                </body></html>
+            `);
+            w.document.close();
+        }
+
+        function eliminar(id) {
+            if (!confirm('¿Eliminar este plan?')) return;
+            store.save(store.all().filter(p => p.id !== id));
+            toast('Plan eliminado', 'ok');
+            render();
+        }
+
+        formPlan.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const datos = Object.fromEntries(new FormData(formPlan));
+            ['calorias','proteina','carbohidratos','grasas'].forEach(k => datos[k] = Number(datos[k]) || 0);
+            const lista = store.all();
+            if (datos.id) {
+                const i = lista.findIndex(p => p.id === Number(datos.id));
+                if (i >= 0) lista[i] = { ...lista[i], ...datos, id: lista[i].id };
+            } else {
+                datos.id = store.nextId('id');
+                lista.push(datos);
+            }
+            store.save(lista);
+            toast('Plan guardado', 'ok');
+            cerrarModal('modalPlan');
+            render();
+        });
+
+        document.getElementById('filtroObjetivo').addEventListener('change', render);
+        filtrarTabla('buscar', 'tablaPlanes');
+        render();
+    </script>
+</body>
+</html>
